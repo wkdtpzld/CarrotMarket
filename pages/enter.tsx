@@ -1,6 +1,5 @@
 import { useState } from "react";
 import NormalInput from "../components/Form/NormalInput";
-import PhoneInput from "../components/Form/PhoneInput";
 import SubmitBtn from "../components/Form/SubmitBtn";
 import { cls } from "../libs/utils";
 
@@ -33,10 +32,10 @@ export default function Enter() {
                 <form className="flex flex-col mt-8">
                     <div className="mt-1">
                         {method === "email"
-                            ? <NormalInput type="text" Label="email" Name="Email address" />
+                            ? <NormalInput type="email" Label="email" Name="Email address" />
                             : null}
                         {method === "phone"
-                            ? <PhoneInput Name="Phone number" Label="phone" /> : null}
+                            ? <NormalInput Name="Phone number" Label="phone" type="phone" /> : null}
                     </div>
                     <SubmitBtn
                         Content={method === "email" ? "Get Login Link" : "Get one-time password"}

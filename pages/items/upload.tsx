@@ -1,7 +1,6 @@
 import type { NextPage } from 'next'
 import Layout from '../../components/Common/Layout';
 import NormalInput from '../../components/Form/NormalInput';
-import PricingInput from '../../components/Form/PricingInput';
 import SubmitBtn from '../../components/Form/SubmitBtn';
 import TextArea from '../../components/Form/TextArea';
 
@@ -32,13 +31,17 @@ const Upload: NextPage = () => {
                 </div>
                 <div>
                     <NormalInput
-                        type='text'
-                        Name='Name'
-                        Label='name'
+                        type='email'
+                        Name='name'
+                        Label='Name'
                     />
                 </div>
                 <div>
-                    <PricingInput />
+                    <NormalInput
+                        type='price'
+                        Name="price"
+                        Label='Price'
+                    />
                 </div>
                 <TextArea
                     Name='Description'

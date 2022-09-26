@@ -1,22 +1,20 @@
 import type { NextPage } from 'next'
 import InputSubmitBtn from '../../components/Form/InputSubmitBtn';
-import MySideChatItem from '../../components/Items/MySideChatItem';
-import OppositeCahtItem from '../../components/Items/OppositeChatItem';
 import Layout from '../../components/Common/Layout';
+import ChattingBubble from '../../components/Items/ChattingBubble';
 
 const chatDetail: NextPage = () => {
     
     return (
         <Layout canGoBack>
             <div className='px-4 py-10 space-y-4'>
-                <OppositeCahtItem
-                    Message='Hi'
+                <ChattingBubble
+                    type='opposite'
+                    Message='hello'
                 />
-                <MySideChatItem
-                    Message='Oh Hi'
-                />
-                <OppositeCahtItem
-                    Message='FU'
+                <ChattingBubble
+                    type='inside'
+                    Message='hi'
                 />
                 <InputSubmitBtn />
             </div>

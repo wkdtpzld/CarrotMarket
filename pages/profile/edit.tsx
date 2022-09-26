@@ -1,7 +1,6 @@
 import type { NextPage } from 'next'
 import Layout from '../../components/Common/Layout';
 import NormalInput from '../../components/Form/NormalInput';
-import PhoneInput from '../../components/Form/PhoneInput';
 import SubmitBtn from '../../components/Form/SubmitBtn';
 
 const ProfileEdit: NextPage = () => { 
@@ -26,7 +25,8 @@ const ProfileEdit: NextPage = () => {
                         />
                     </div>
                     <div className='space-y-2'>
-                        <PhoneInput
+                        <NormalInput
+                            type='phone'
                             Label='phone'
                             Name='Phone Number'
                         />

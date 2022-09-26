@@ -3,7 +3,6 @@ import Layout from '../../components/Common/Layout';
 import SubmitBtn from '../../components/Form/SubmitBtn';
 import TextArea from '../../components/Form/TextArea';
 import NormalInput from '../../components/Form/NormalInput';
-import PricingInput from '../../components/Form/PricingInput';
 
 const Create: NextPage = () => { 
 
@@ -12,13 +11,17 @@ const Create: NextPage = () => {
             <div className='px-4 py-4 space-y-4'>
                 <div>
                     <NormalInput
-                        type='text'
+                        type='email'
                         Name='Name'
                         Label='name'
                     />
                 </div>
                 <div>
-                    <PricingInput />
+                    <NormalInput
+                        type='price'
+                        Name='Price'
+                        Label='Price'
+                    />
                 </div>
                 <TextArea
                     Placeholder='introduce your item'

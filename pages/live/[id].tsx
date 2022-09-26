@@ -1,8 +1,8 @@
 import type { NextPage } from 'next'
 import InputSubmitBtn from '../../components/Form/InputSubmitBtn';
-import MySideChatItem from '../../components/Items/MySideChatItem';
-import OppositeCahtItem from '../../components/Items/OppositeChatItem';
+
 import Layout from '../../components/Common/Layout';
+import ChattingBubble from '../../components/Items/ChattingBubble';
 
 const LiveDetail: NextPage = () => { 
 
@@ -16,11 +16,13 @@ const LiveDetail: NextPage = () => {
                     </h3>
                 </div>
                 <div className='py-10 space-y-4 h-[50vh] pb-16 overflow-y-scroll'>
-                    <OppositeCahtItem
+                    <ChattingBubble
                         Message='hi'
+                        type='opposite'
                     />
-                    <MySideChatItem
-                        Message='HHHH'
+                    <ChattingBubble
+                        Message='hello'
+                        type='inside'
                     />
                 </div>
                 <InputSubmitBtn />
