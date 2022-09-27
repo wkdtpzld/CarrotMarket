@@ -1,14 +1,35 @@
 import { useState } from "react";
-import NormalInput from "../components/Form/NormalInput";
-import SubmitBtn from "../components/Form/SubmitBtn";
-import { cls } from "../libs/utils";
+import { useForm } from "react-hook-form";
+import NormalInput from "@components/Form/NormalInput";
+import SubmitBtn from "@components/Form/SubmitBtn";
+import useMutation from "@libs/client/useMutation";
+import { cls } from "@libs/client/utils";
 
+interface EnterForm {
+    email?: string;
+    phone?: string;
+}
 
 export default function Enter() {
     
+    const [enter, {loading, data, error}] = useMutation("/api/users/enter");
+    const { register, reset, handleSubmit } = useForm<EnterForm>();
     const [method, setMethod] = useState<"email" | "phone">("email");
-    const onEmailClick = () => setMethod("email");
-    const onPhoneClick = () => setMethod("phone");
+    const onEmailClick = () => {
+        reset();
+        setMethod("email");
+    }
+    const onPhoneClick = () => {
+        reset();
+        setMethod("phone");
+    }
+
+    const onValid = (data: EnterForm) => {
+        enter(data);
+    };
+
+    console.log(loading, data, error);
+    
 
     return (
         <div className="mt-16 px-4">
@@ -29,16 +50,35 @@ export default function Enter() {
                             onClick={onPhoneClick}>Phone</button>
                     </div>
                 </div>
-                <form className="flex flex-col mt-8">
+                <form className="flex flex-col mt-8" onSubmit={handleSubmit(onValid)}>
                     <div className="mt-1">
                         {method === "email"
-                            ? <NormalInput type="email" Label="email" Name="Email address" />
+                            ? <NormalInput
+                                required
+                                kind="email"
+                                type="text"
+                                Label="email"
+                                Name="Email address"
+                                register={register("email", {
+                                    required: true
+                                })} />
                             : null}
                         {method === "phone"
-                            ? <NormalInput Name="Phone number" Label="phone" type="phone" /> : null}
+                            ? <NormalInput
+                                required
+                                kind="phone"
+                                Name="Phone number"
+                                Label="phone"
+                                type="number"
+                                register={register("phone", {
+                                    required: true
+                                })} />
+                            : null}
                     </div>
                     <SubmitBtn
-                        Content={method === "email" ? "Get Login Link" : "Get one-time password"}
+                        Content={method === "email"
+                            ? loading ? "Loading" : "Get Login Link"
+                            : loading ? "Loading" : "Get one-time password"}
                     />
                 </form>
                 <div className="mt-6">

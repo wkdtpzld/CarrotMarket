@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
-import AddBtn from '../../components/Icon/AddBtn';
-import CommunityItem from '../../components/Items/CommunityItem';
-import Layout from '../../components/Common/Layout';
+import AddBtn from '@components/Icon/AddBtn';
+import CommunityItem from '@components/Items/CommunityItem';
+import Layout from '@components/Common/Layout';
 
 const Community: NextPage = () => { 
 

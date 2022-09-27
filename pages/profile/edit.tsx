@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
-import Layout from '../../components/Common/Layout';
-import NormalInput from '../../components/Form/NormalInput';
-import SubmitBtn from '../../components/Form/SubmitBtn';
+import Layout from '@components/Common/Layout';
+import NormalInput from '@components/Form/NormalInput';
+import SubmitBtn from '@components/Form/SubmitBtn';
 
 const ProfileEdit: NextPage = () => { 
 

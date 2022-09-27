@@ -1,8 +1,8 @@
 import type { NextPage } from 'next'
-import Layout from '../../components/Common/Layout';
-import SubmitBtn from '../../components/Form/SubmitBtn';
-import TextArea from '../../components/Form/TextArea';
-import NormalInput from '../../components/Form/NormalInput';
+import Layout from '@components/Common/Layout';
+import SubmitBtn from '@components/Form/SubmitBtn';
+import TextArea from '@components/Form/TextArea';
+import NormalInput from '@components/Form/NormalInput';
 
 const Create: NextPage = () => { 
 

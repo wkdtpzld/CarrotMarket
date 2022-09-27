@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { cls, MenuIconType } from '../../libs/utils';
+import { cls, MenuIconType } from '../../libs/client/utils';
 import TabBarMenu from './TabBarMenu';
 interface LayoutProps {
     children: React.ReactNode

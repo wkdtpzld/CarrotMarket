@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
-import SilmilarItem from '../../components/Items/SimilarItem';
-import Layout from '../../components/Common/Layout';
-import ProfileBox from '../../components/Common/ProfileBox';
+import SilmilarItem from '@components/Items/SimilarItem';
+import Layout from '@components/Common/Layout';
+import ProfileBox from '@components/Common/ProfileBox';
 
 const ItemDetail: NextPage = () => { 
 

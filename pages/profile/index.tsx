@@ -1,9 +1,9 @@
 import type { NextPage } from 'next'
-import Layout from '../../components/Common/Layout';
-import ProfileBox from '../../components/Common/ProfileBox';
-import ProfileMenu from '../../components/Common/Profilemenu';
-import Star from '../../components/Icon/Star';
-import { StarType } from '../../libs/utils';
+import Layout from '@components/Common/Layout';
+import ProfileBox from '@components/Common/ProfileBox';
+import ProfileMenu from '@components/Common/Profilemenu';
+import Star from '@components/Icon/Star';
+import { StarType } from '../../libs/client/utils';
 
 const Profile: NextPage = () => { 
 

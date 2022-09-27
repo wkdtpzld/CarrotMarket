@@ -1,10 +1,10 @@
 import type { NextPage } from 'next'
-import CommentItem from '../../components/Items/CommentItem';
-import Layout from '../../components/Common/Layout';
-import ProfileBox from '../../components/Common/ProfileBox';
-import SubmitBtn from '../../components/Form/SubmitBtn';
-import TextArea from '../../components/Form/TextArea';
-import CommunityItemIcon from '../../components/Items/CommunityItemIcon';
+import CommentItem from '@components/Items/CommentItem';
+import Layout from '@components/Common/Layout';
+import ProfileBox from '@components/Common/ProfileBox';
+import SubmitBtn from '@components/Form/SubmitBtn';
+import TextArea from '@components/Form/TextArea';
+import CommunityItemIcon from '@components/Items/CommunityItemIcon';
 
 const CommunityDetail: NextPage = () => { 
     return (

@@ -1,8 +1,8 @@
 import type { NextPage } from 'next'
-import InputSubmitBtn from '../../components/Form/InputSubmitBtn';
+import InputSubmitBtn from '@components/Form/InputSubmitBtn';
 
-import Layout from '../../components/Common/Layout';
-import ChattingBubble from '../../components/Items/ChattingBubble';
+import Layout from '@components/Common/Layout';
+import ChattingBubble from '@components/Items/ChattingBubble';
 
 const LiveDetail: NextPage = () => { 
 

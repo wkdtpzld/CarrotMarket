@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
-import AddBtn from '../../components/Icon/AddBtn';
-import StreamItem from '../../components/Items/StreamItem';
-import Layout from '../../components/Common/Layout';
+import AddBtn from '@components/Icon/AddBtn';
+import StreamItem from '@components/Items/StreamItem';
+import Layout from '@components/Common/Layout';
 
 const Live: NextPage = () => { 
 
