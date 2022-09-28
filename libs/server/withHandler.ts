@@ -9,7 +9,7 @@ export default function withHandler(
     method: "GET" | "POST" | "DELETE" | "PUT",
     fn: (request: NextApiRequest, response: NextApiResponse) => void) {
 
-    return async function (request: NextApiRequest, response: NextApiResponse) {
+    return async function (request: NextApiRequest, response: NextApiResponse) : Promise<any> {
         if (request.method !== method) {
             return response.status(405).end();
         }
