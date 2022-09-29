@@ -19,23 +19,15 @@ interface EnterMutationResult {
 
 export default function Enter() {
     
+    // useMutation
     const [enter, { loading, data, error }] = useMutation<EnterMutationResult>("/api/users/enter");
     const [confirmToken, { loading: tokenLoading, data: tokenData, error: tokenError }]
         = useMutation<EnterMutationResult>("/api/users/confirm");
     
+    // useForm
     const { register, reset, handleSubmit } = useForm<EnterForm>();
     const { register: tokenRegister, handleSubmit: tokenHandleSubmit } = useForm<EnterForm>();
     
-    const [method, setMethod] = useState<"email" | "phone">("email");
-    const onEmailClick = () => {
-        reset();
-        setMethod("email");
-    }
-    const onPhoneClick = () => {
-        reset();
-        setMethod("phone");
-    }
-
     const onValid = (data: EnterForm) => {
         enter(data);
     };
@@ -45,6 +37,21 @@ export default function Enter() {
         confirmToken(validData);
 
     }
+
+    // Email || Phone
+    const [method, setMethod] = useState<"email" | "phone">("email");
+
+    // Reset Logic
+    const onEmailClick = () => {
+        reset();
+        setMethod("email");
+    }
+    const onPhoneClick = () => {
+        reset();
+        setMethod("phone");
+    }
+
+    // Login Success router push logic
     const router = useRouter();
 
     useEffect(() => {
