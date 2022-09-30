@@ -13,7 +13,7 @@ async function handler(
         session: { user }
     } = request;
 
-    const product = await client.product.findUnique({
+    const post = await client.post.findUnique({
         where: {
             id: Number(id)
         },
@@ -22,44 +22,46 @@ async function handler(
         }
     });
 
-    if (!product) {
+    if (!post) {
         response.status(404).end();
-    }
+    };
 
-    const alreadyExists = await client.fav.findFirst({
+    const alreadyExists = await client.wondering.findFirst({
         where: {
-            productId: Number(id),
-            userId: user?.id
+            userId: user?.id,
+            postId: Number(id)
+        },
+        select: {
+            id: true
         }
     });
 
     if (alreadyExists) {
-        await client.fav.delete({
+        await client.wondering.delete({
             where: {
                 id: alreadyExists.id
             }
         })
     } else {
-        await client.fav.create({
+        await client.wondering.create({
             data: {
                 user: {
                     connect: {
                         id: user?.id
                     }
                 },
-                product: {
+                post: {
                     connect: {
                         id: Number(id)
                     }
                 }
-            }
+            },
         })
-    }
+    };
 
-    return response.json({
+    response.json({
         ok: true
     })
-    
 }
 
 export default withApiSession(withHandler({

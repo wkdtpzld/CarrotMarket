@@ -10,9 +10,9 @@ import SubmitBtn from '@components/Form/SubmitBtn';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Product, User } from '@prisma/client';
-import useMutation from '../../libs/client/useMutation';
-import { cls } from '../../libs/client/utils';
-import useUser from '../../libs/client/useUser';
+import useMutation from '@libs/client/useMutation';
+import { cls } from '@libs/client/utils';
+import useUser from '@libs/client/useUser';
 import {motion} from 'framer-motion';
 
 interface ProductWithUser extends Product {
@@ -24,25 +24,6 @@ interface ItemDetailResponse {
     product: ProductWithUser;
     relatedProducts: Product[];
     isLiked: boolean;
-}
-
-const heartVariants = {
-    normal: {
-        scale: 0.3,
-        transition: {
-            type: "spring"
-        }
-    },
-    click: {
-        scale: 1,
-        transition: {
-            type: "spring"
-        }
-    },
-    exit: {
-        scale: 0.3
-    }
-
 }
 
 const ItemDetail: NextPage = () => { 

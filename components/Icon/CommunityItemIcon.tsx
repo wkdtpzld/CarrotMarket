@@ -1,14 +1,20 @@
+import { cls } from '../../libs/client/utils';
 
 interface IProps {
     Attention: number;
     Answer: number;
+    onClick?: (ev: React.MouseEvent<HTMLButtonElement>) => void;
+    isWondering?: boolean;
 }
 
-const CommunityItemIcon = ({Attention, Answer}:IProps) => {
+const CommunityItemIcon = ({Attention, Answer, onClick, isWondering}:IProps) => {
 
     return (
         <div className='flex space-x-5 mt-3 text-gray-700 py-2.5 border-t border-b-[2px] w-full'>
-                <span className='flex space-x-2 text-sm items-center'>
+            <button
+                className={cls('flex space-x-2 text-sm items-center mx-4',
+                    isWondering ? "text-teal-600" : "")}
+                onClick={onClick}>
                     <svg
                         className="w-4 h-4"
                         fill="none"
@@ -24,7 +30,7 @@ const CommunityItemIcon = ({Attention, Answer}:IProps) => {
                         ></path>
                     </svg>
                     <span>궁금해요 {Attention}</span>
-                </span>
+                </button>
                 <span className='flex space-x-2 text-sm items-center'>
                     <svg
                         className="w-4 h-4"
