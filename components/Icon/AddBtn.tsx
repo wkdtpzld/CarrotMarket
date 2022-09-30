@@ -7,7 +7,7 @@ const AddBtn = ({ IconD }:IProps) => {
 
     return (
         <>
-        <button className='fixed bottom-24 right-5 bg-orange-400 rounded-full p-4 text-white shadow-xl
+        <button className='z-50 fixed bottom-24 right-5 bg-orange-400 rounded-full p-4 text-white shadow-xl
             hover:bg-orange-500 cursor-pointer transition-colors border-none'>
             <svg
                 className="h-6 w-6"

@@ -32,32 +32,37 @@ export default function Layout({ title, canGoBack, hasTabBar, children }: Layout
             <div className={cls("pt-14", hasTabBar ? "pb-24" : "")}>
                 {children}
             </div>
-            {hasTabBar ? <nav className='bg-white text-gray-800 border-t fixed bottom-0 px-10 pb-3 pt-3
+            {hasTabBar ? <nav className='z-50 bg-white text-gray-800 border-t fixed bottom-0 px-10 pb-3 pt-3
                 flex justify-between items-center max-w-xl w-full'>
                 <TabBarMenu
                     IconD={MenuIconType.Home}
                     to='/'
                     title='홈'
+                    router='/'
                 />
                 <TabBarMenu
                     IconD={MenuIconType.Community}
                     to='/community'
                     title='동내생활'
+                    router='/community'
                 />
                 <TabBarMenu
                     IconD={MenuIconType.Chat}
                     to='/chats'
                     title='채팅'
+                    router='/chats'
                 />
                 <TabBarMenu
                     IconD={MenuIconType.Live}
                     to='/live'
                     title='스트리밍'
+                    router='/live'
                 />
                 <TabBarMenu
                     IconD={MenuIconType.Profile}
                     to='/profile'
                     title='프로필'
+                    router='/profile'
                 />
             </nav> : null}
         </div>
