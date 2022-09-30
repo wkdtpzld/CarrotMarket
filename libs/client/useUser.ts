@@ -4,7 +4,7 @@ import useSWR from 'swr';
 
 export default function useUser() {
 
-    const {data, error, mutate} = useSWR("/api/users/me");
+    const {data, error} = useSWR("/api/users/me");
 
     const router = useRouter();
 
