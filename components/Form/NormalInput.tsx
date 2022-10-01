@@ -1,4 +1,5 @@
 import type { UseFormRegisterReturn } from "react-hook-form/dist/types";
+import { FieldError } from 'react-hook-form';
 
 interface IProps {
     Label: string;
@@ -6,10 +7,11 @@ interface IProps {
     kind: "email" | "phone" | "price";
     register: UseFormRegisterReturn;
     type: string;
-    required: boolean
+    required?: boolean
+    error?: FieldError
 }
 
-const NormalInput = ({Label, Name, type, register, kind, required}:IProps) => {
+const NormalInput = ({Label, Name, type, register, kind, required, error}:IProps) => {
 
     return (
         <>
@@ -79,6 +81,11 @@ const NormalInput = ({Label, Name, type, register, kind, required}:IProps) => {
                 ) : (
                 null
                 )}
+            <div className="mt-2">
+            {error?.message ?
+                <span className="text-sm text-red-600 font-medium ">{error.message}</span>
+                : null}
+            </div>
         </>
     )
 }

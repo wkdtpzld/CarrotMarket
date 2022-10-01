@@ -4,6 +4,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { ResponseType } from '@libs/server/withHandler';
 import { withApiSession } from '@libs/server/withSession';
 
+
+
 async function handler(
     request: NextApiRequest,
     response: NextApiResponse<ResponseType>
@@ -41,12 +43,24 @@ async function handler(
     } else if (request.method === "GET") {
         const products = await client.product.findMany({
             include: {
+                records: {
+                    where: {
+                        kind: 'Fav'
+                    },
+                    select: {
+                        id: true
+                    }
+                },
                 _count: {
                     select: {
-                        fav: true
-                    }
+                        records: {
+                            where: {
+                                kind: 'Fav'
+                            }
+                        }
+                    },
                 }
-            }
+            },
         });
 
         response.json({

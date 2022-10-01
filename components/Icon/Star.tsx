@@ -1,3 +1,4 @@
+import { cls } from '../../libs/client/utils';
 
 interface IProps {
     type: string;
@@ -7,7 +8,7 @@ const Star = ({type}:IProps) => {
 
     return (
         <svg
-            className={type}
+            className={cls("w-5 h-5", type === "Fill" ? "text-yellow-500" : "text-gray-300")}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"

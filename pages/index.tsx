@@ -12,7 +12,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 
 interface ProductsWithHeart extends Product {
   _count: {
-    fav: number;
+    records: number;
   }
 }
 
@@ -23,7 +23,6 @@ interface ProductsResponse {
 
 const Home: NextPage = () => {
 
-  const { user, isLoading } = useUser();
   const { data } = useSWR<ProductsResponse>("/api/products");
 
   return (
@@ -35,14 +34,14 @@ const Home: NextPage = () => {
         {
           data ? (
             <>
-              {data.products.map((product) => (
+              {data?.products?.map((product) => (
                 <Item
                   key={product.id}
                   id={product.id}
                   Name={product.name}
                   Category={product.price + ""}
                   Price={product.price}
-                  Like={product._count.fav}
+                  Like={product._count.records}
                   ChatCount={2} />
               ))}
             </>

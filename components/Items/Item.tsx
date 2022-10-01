@@ -5,7 +5,7 @@ interface IProps {
     Category: string;
     Price: number;
     Like: number;
-    ChatCount: number;
+    ChatCount?: number;
     id: number;
 }
 

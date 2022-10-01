@@ -12,7 +12,7 @@ interface IProps {
 const ProfileBox = ({ Name, isMine, id }: IProps) => {
 
     return (
-        <Link href={`/profile/${id + ""}`}>
+        <Link href={!isMine? `/profile/${id + ""}` : `/profile/edit`}>
             <a className='flex space-x-4 items-center'>
                 <div className='w-16 h-16 bg-slate-300 rounded-full' />
                 <div className='flex flex-col'>
