@@ -2,17 +2,18 @@ import type { NextPage } from 'next'
 import AddBtn from '@components/Icon/AddBtn';
 import CommunityItem from '@components/Items/CommunityItem';
 import Layout from '@components/Common/Layout';
-import useSWR from 'swr';
 import { Post, User } from '@prisma/client';
 import CommunityItemIcon from '@components/Icon/CommunityItemIcon';
+import useSWRInfinite from 'swr/infinite';
 
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import Link from 'next/link';
 import useCoords from '../../libs/client/useCoords';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import TransformDate from '../../libs/client/TransformDate';
+import { useInfiniteScroll } from '../../libs/client/useInfiniteScroll';
 
 interface PostWithUser extends Post {
     user: User,
@@ -24,21 +25,41 @@ interface PostWithUser extends Post {
 
 interface PostsResponse {
     ok: boolean;
-    posts: PostWithUser[]
+    posts: PostWithUser[],
+    pages: number;
 }
 
 const Community: NextPage = () => { 
 
+    const getKey = (pageIndex: number, previousPageData: PostsResponse) => {
+        if (latitude && longitude) {
+            if (pageIndex === 0) return `/api/posts?page=1&latitude=${latitude}&longitude=${longitude}&level=${level}`;
+            if (pageIndex + 1 > previousPageData.pages) return null;
+            return `/api/posts?page=${pageIndex + 1}&latitude=${latitude}&longitude=${longitude}&level=${level}`;
+        } else {
+            return null;
+        }
+    }
+    
+    const fetcher = (url: string) => fetch(url).then((res) => res.json());
+    
+
     const { latitude, longitude } = useCoords();
-    const [level, setLevel] = useState(0.01);
+    const [level, setLevel] = useState(0.01);   
 
     const onLevelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setLevel(current => current = Number(event.target.value));
+        setLevel((current) => current = Number(event.target.value));
         mutate();
     };
 
-    const { data, mutate } = useSWR<PostsResponse>
-        ( latitude && longitude ? `/api/posts?latitude=${latitude}&longitude=${longitude}&level=${level}` : null );
+    const page = useInfiniteScroll();
+    const { data, setSize, mutate } = useSWRInfinite<PostsResponse>(getKey, fetcher);
+    
+    useEffect(() => {
+        setSize(page)
+    }, [setSize, page]);
+
+    const posts = data ? data.map(item => item.posts).flat() : [];
 
     return (
         <Layout title='동내생활' hasTabBar>
@@ -58,15 +79,15 @@ const Community: NextPage = () => {
             {data
                 ? (
                     <>
-                    {data?.posts.map((post) => (
+                    {posts.map((post) => (
                         <CommunityItem
-                            key={post.id}
+                            key={post?.id}
                             Question={post?.question}
-                            Name={post.user.name}
-                            Answer={post._count.answers}
-                            Attention={post._count.wondering}
-                            Time={TransformDate(post.createdAt)}
-                            id={post.id}
+                            Name={post?.user.name}
+                            Answer={post?._count.answers}
+                            Attention={post?._count.wondering}
+                            Time={TransformDate(post?.createdAt)}
+                            id={post?.id}
                         />
                     ))}
                     </>

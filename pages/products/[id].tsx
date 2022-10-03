@@ -14,6 +14,7 @@ import useMutation from '@libs/client/useMutation';
 import { cls } from '@libs/client/utils';
 import useUser from '@libs/client/useUser';
 import {motion} from 'framer-motion';
+import NotFound from '@components/Common/NotFound';
 
 interface ProductWithUser extends Product {
     user: User;
@@ -48,6 +49,8 @@ const ItemDetail: NextPage = () => {
         <Layout canGoBack>
             <div className='px-4 py-10'>
                 <div className='mb-6'>
+                    {data?.product !== null ? (
+                    <>
                     <div className='h-96 bg-slate-300 mb-4' />
                     <ProfileBox
                         Name={data?.product.user.name!}
@@ -108,37 +111,38 @@ const ItemDetail: NextPage = () => {
                             </motion.button>
                         </div>
                     </div>
-                    </div>
-                    <div className=''>
+                    <div className='mt-6'>
                     <h2 className='text-2xl font-bold text-gray-800'>Similar items</h2>
                     <div className='grid grid-cols-2 gap-4 mt-6'>
                         {data
-                            ? (
-                                data.relatedProducts.map((item) => (
-                                    <Link key={item.id} href={`/products/${item.id}`}>
-                                        <a>
-                                            <SilmilarItem
-                                                Name={item.name}
-                                                Price={item.price}
-                                            />
-                                        </a>
-                                    </Link>
-                                ))
-                            )
-                            : (
-                                [1, 1, 1, 1].map((_, i) => (
-                                    <div key={i}>
-                                        <Skeleton height={224} className="mb-4"/>
-                                        <Skeleton className='-mb-1' />
-                                        <Skeleton height={10}/>
-                                    </div>
-                                ))
-                                
-                                
-                            )
-                            }
-                        
+                        ? (
+                            data.relatedProducts.map((item) => (
+                                <Link key={item.id} href={`/products/${item.id}`}>
+                                    <a>
+                                        <SilmilarItem
+                                            Name={item.name}
+                                            Price={item.price}
+                                        />
+                                    </a>
+                                </Link>
+                            ))
+                        ) : (
+                            [1, 1, 1, 1].map((_, i) => (
+                                <div key={i}>
+                                    <Skeleton height={224} className="mb-4"/>
+                                    <Skeleton className='-mb-1' />
+                                    <Skeleton height={10}/>
+                                </div>
+                            ))
+                            
+                            
+                        )}
+                        </div>
                     </div>
+                    </>
+                    ) : (
+                        <NotFound Content='상품 정보를 찾을 수 없습니다.'/>
+                    )}
                 </div>
             </div>
         </Layout>

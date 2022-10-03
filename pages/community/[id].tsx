@@ -15,6 +15,7 @@ import useMutation from '../../libs/client/useMutation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
+import NotFound from '@components/Common/NotFound';
 
 interface AnswerWithUser extends Answer{
     user: User;
@@ -88,7 +89,8 @@ const CommunityDetail: NextPage = () => {
 
     return (
         <Layout canGoBack>
-            <div className=''>
+            {data?.post ? (
+                <div className=''>
                 <span className='inline-flex my-3 ml-4 items-center px-4 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800'
                     >동네질문</span>
                 <div className='flex mb-5 py-3 border-t border-b items-center space-x-3 px-4'>
@@ -170,6 +172,9 @@ const CommunityDetail: NextPage = () => {
                     />
                 </form>
             </div>
+            ) : (
+                <NotFound Content='해당 질문을 찾을 수 없습니다.'/>
+            )}
         </Layout>
         
     )

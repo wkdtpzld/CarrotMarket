@@ -54,9 +54,9 @@ export default function Layout({ title, canGoBack, hasTabBar, children }: Layout
                 />
                 <TabBarMenu
                     IconD={MenuIconType.Live}
-                    to='/live'
+                    to='/stream'
                     title='스트리밍'
-                    router='/live'
+                    router='/stream'
                 />
                 <TabBarMenu
                     IconD={MenuIconType.Profile}

@@ -2,13 +2,14 @@ import type { NextPage } from 'next'
 import AddBtn from '@components/Icon/AddBtn';
 import Item from '@components/Items/Item';
 import Layout from '@components/Common/Layout';
-import useUser from '../libs/client/useUser';
+import useSWRInfinite from 'swr/infinite';
 import Head from 'next/head';
 import Link from 'next/link';
-import useSWR from 'swr';
 import { Product } from '@prisma/client';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
+import { useInfiniteScroll } from '../libs/client/useInfiniteScroll';
+import { useEffect } from 'react';
 
 interface ProductsWithHeart extends Product {
   _count: {
@@ -19,11 +20,27 @@ interface ProductsWithHeart extends Product {
 interface ProductsResponse {
   ok: boolean;
   products: ProductsWithHeart[];
+  pages: number;
 }
+
+const getKey = (pageIndex: number, previousPageData: ProductsResponse) => {
+  if (pageIndex === 0) return `/api/products?page=1`;
+  if (pageIndex + 1 > previousPageData.pages) return null;
+  return `/api/products?page=${pageIndex + 1}`;
+};
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Home: NextPage = () => {
 
-  const { data } = useSWR<ProductsResponse>("/api/products");
+  const { data, setSize } = useSWRInfinite<ProductsResponse>(getKey, fetcher);
+
+  const products = data ? data.map(item => item.products).flat() : [];
+
+  const page = useInfiniteScroll();
+  useEffect(() => {
+    setSize(page);
+  }, [setSize, page])
 
   return (
     <Layout title='홈' hasTabBar>
@@ -34,7 +51,7 @@ const Home: NextPage = () => {
         {
           data ? (
             <>
-              {data?.products?.map((product) => (
+              {products.map((product) => (
                 <Item
                   key={product.id}
                   id={product.id}

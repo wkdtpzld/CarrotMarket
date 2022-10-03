@@ -35,12 +35,13 @@ async function handler(
 
     } else if (request.method === "GET") {
 
-        const { query: { latitude, longitude, level } } = request;
+        const { query: { latitude, longitude, level, page } } = request;
 
         const levelFloat = parseFloat(level?.toString()!);
         const latitudeFloat = parseFloat(latitude?.toString()!);
         const longitudeFloat = parseFloat(longitude?.toString()!);
 
+        const postCount = await client.post.count();
         const posts = await client.post.findMany({
             include: {
                 user: {
@@ -66,17 +67,17 @@ async function handler(
                     gte: longitudeFloat - levelFloat,
                     lte: longitudeFloat + levelFloat
                 }
-            }
+            },
+            take: 10,
+            
         });
 
         response.json({
             ok: true,
-            posts
+            posts,
+            pages: Math.ceil(postCount / 10)
         })
     }
-
-
-
 }
 
 export default withApiSession(withHandler({

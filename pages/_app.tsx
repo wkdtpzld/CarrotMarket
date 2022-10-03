@@ -11,7 +11,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           fetcher: (url: string) =>
             fetch(url).then((response) => response.json())
           }}>
-        <div className='w-full max-w-lg mx-auto'>
+        <div className='w-full max-w-lg mx-auto '>
           <LoginCheck />
           <Component {...pageProps} />
         </div>

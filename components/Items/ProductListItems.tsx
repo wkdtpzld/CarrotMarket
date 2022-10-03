@@ -26,10 +26,7 @@ interface ProductListResponse {
 
 
 const ProductListItems = ({kind}:IProps) => {
-    const { data } = useSWR<ProductListResponse>(kind ? `/api/users/me/records?kind=${kind}` : null);
-
-    console.log(data);
-    
+    const { data } = useSWR<ProductListResponse>(`/api/users/me/records?kind=${kind}`);
 
     return (
         <>

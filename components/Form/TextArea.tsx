@@ -5,7 +5,7 @@ interface IProps {
     Placeholder: string;
     Name?: string;
     register: UseFormRegisterReturn;
-    required: boolean;
+    required?: boolean;
     error?: FieldError
 }
 

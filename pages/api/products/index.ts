@@ -19,7 +19,7 @@ async function handler(
             },
             session: {
                 user
-            }
+            },
         } = request
     
         const product = await client.product.create({
@@ -41,6 +41,12 @@ async function handler(
             product,
         })
     } else if (request.method === "GET") {
+
+        const {
+            query: {page}
+        } = request
+
+        const productCount = await client.product.count();
         const products = await client.product.findMany({
             include: {
                 records: {
@@ -61,11 +67,14 @@ async function handler(
                     },
                 }
             },
+            take: 10,
+            skip: (Number(page) -1) * 10
         });
 
         response.json({
             ok: true,
-            products
+            products,
+            pages: Math.ceil(productCount / 10)
         })
     }
 }

@@ -1,46 +1,49 @@
 import client from "@libs/server/client";
+import withHandler from "@libs/server/withHandler";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ResponseType } from '@libs/server/withHandler';
-
-import withHandler from '@libs/server/withHandler';
 import { withApiSession } from '@libs/server/withSession';
+
+declare module "iron-session" {
+
+    interface IronSessionData {
+        user?: {
+            id: number
+        }
+    }
+}
 
 async function handler(
     request: NextApiRequest,
     response: NextApiResponse<ResponseType>
 ) {
     const {
-        session: { user },
-        query: { kind }
+        query: { id }
     } = request;
 
-
-    const records = await client.record.findMany({
+    const stream = await client.stream.findUnique({
         where: {
-            userId: user?.id,
-            kind
+            id: Number(id)
         },
         include: {
-            product: {
-                include: {
-                    _count: {
+            messages: {
+                select: {
+                    message: true,
+                    id: true,
+                    user: {
                         select: {
-                            records: {
-                                where: {
-                                    kind
-                                }
-                            }
+                            id: true,
+                            avator: true
                         }
                     }
                 }
-            },
-        },
-        
+            }
+        }
     });
 
     response.json({
         ok: true,
-        records
+        stream
     })
 }
 
