@@ -15,7 +15,7 @@ const ChattingBubble = ({ Message, type }: IProps) => {
             <div className='w-1/2 text-sm text-gray-700 p-2 border rounded-md
                 border-gray-400'>
                 <p>{Message}</p>
-            </div>
+            </div> 
         </div>
     )
 }

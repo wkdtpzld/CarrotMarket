@@ -22,7 +22,8 @@ async function handler(
             user: {
                 select: {
                     id: true,
-                    name: true
+                    name: true,
+                    avator: true
                 }
             }
         }

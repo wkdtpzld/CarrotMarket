@@ -18,7 +18,8 @@ async function handler(
     response: NextApiResponse<ResponseType>
 ) {
     const {
-        query: { id }
+        query: { id },
+        session: { user }
     } = request;
 
     const stream = await client.stream.findUnique({
@@ -29,7 +30,6 @@ async function handler(
             messages: {
                 select: {
                     message: true,
-                    id: true,
                     user: {
                         select: {
                             id: true,
@@ -38,9 +38,16 @@ async function handler(
                     }
                 }
             }
-        }
+        },
+        
     });
 
+    const isOwner = stream?.userId === user?.id;
+    if (stream && !isOwner) {
+        stream.cloudflareKey = "xxxxx";
+        stream.cloudflareUrl = "xxxxx";
+    }
+    
     response.json({
         ok: true,
         stream

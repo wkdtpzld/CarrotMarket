@@ -11,10 +11,12 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Product, User } from '@prisma/client';
 import useMutation from '@libs/client/useMutation';
-import { cls } from '@libs/client/utils';
+import { cls, ImageURL } from '@libs/client/utils';
 import useUser from '@libs/client/useUser';
 import {motion} from 'framer-motion';
 import NotFound from '@components/Common/NotFound';
+import { useState } from 'react';
+import Image from 'next/image';
 
 interface ProductWithUser extends Product {
     user: User;
@@ -25,16 +27,19 @@ interface ItemDetailResponse {
     product: ProductWithUser;
     relatedProducts: Product[];
     isLiked: boolean;
+    error?: string;
 }
 
 const ItemDetail: NextPage = () => { 
 
     const router = useRouter();
+    const [status, setStatus] = useState(true);
     const { user, isLoading } = useUser();
 
     const { data, mutate:boundMutate } = useSWR<ItemDetailResponse>
         (router.query.id ? `/api/products/${router.query.id}` : null);
     
+
     const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
     const onFavClick = () => {
         toggleFav({})
@@ -47,15 +52,23 @@ const ItemDetail: NextPage = () => {
     
     return (
         <Layout canGoBack>
-            <div className='px-4 py-10'>
-                <div className='mb-6'>
-                    {data?.product !== null ? (
+            <div className='px-4 py-10 '>
+                <div className=''>
+                    {!data?.error && data?.product !== null ? (
                     <>
-                    <div className='h-96 bg-slate-300 mb-4' />
+                    <div className='relative pb-96 mb-6'>      
+                        <Image 
+                            src={ImageURL(data?.product.image!, "public")} 
+                            className='h-96 bg-slate-300 mb-4 m-auto object-scale-down rounded-md' 
+                            layout='fill'
+                            alt={data?.product.name}
+                        />
+                    </div>
                     <ProfileBox
-                        Name={data?.product.user.name!}
+                        Name={data?.product?.user.name!}
                         isMine={false}
-                        id={data?.product.userId!}
+                        id={data?.product?.userId!}
+                        imageId={data?.product.user.avator!}
                     />
                     <div className='mt-10'>
                         {!data ? (
@@ -66,10 +79,10 @@ const ItemDetail: NextPage = () => {
                             </>
                         )  :
                             <>
-                                <h1 className='text-3xl font-bold text-gray-800'>{data?.product.name}</h1>
-                                <span className='text-3xl mt-3 block'>${data?.product.price}</span>
+                                <h1 className='text-3xl font-bold text-gray-800'>{data?.product?.name}</h1>
+                                <span className='text-3xl mt-3 block'>${data?.product?.price}</span>
                                 <p className='text-base my-6 text-gray-700'>
-                                    {data?.product.description}
+                                    {data?.product?.description}
                                 </p>
                             </>
                         }
@@ -116,7 +129,7 @@ const ItemDetail: NextPage = () => {
                     <div className='grid grid-cols-2 gap-4 mt-6'>
                         {data
                         ? (
-                            data.relatedProducts.map((item) => (
+                            data.relatedProducts?.map((item) => (
                                 <Link key={item.id} href={`/products/${item.id}`}>
                                     <a>
                                         <SilmilarItem

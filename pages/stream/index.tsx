@@ -39,6 +39,7 @@ const Stream: NextPage = () => {
                         key={stream.id}
                         Name={stream.name}
                         id={stream.id}
+                        streamId={stream.cloudflareId}
                     />
                 ))}
                 <Link href="/stream/create">

@@ -24,9 +24,6 @@ const Profile: NextPage = () => {
     const { user, isLoading } = useUser();
     const { data } = useSWR<ReviewsResponse>(`api/reviews`);
 
-    console.log(data);
-    
-
     return (
         <Layout title='프로필' hasTabBar>
             <div className="py-10 px-4">
@@ -34,6 +31,7 @@ const Profile: NextPage = () => {
                     Name={user?.name!}
                     isMine
                     id={user?.id!}
+                    imageId={user?.avator!}
                 />
                 <div className='mt-10 flex justify-around'>
                     <Link href='/profile/sold'>

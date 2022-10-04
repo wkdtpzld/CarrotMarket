@@ -25,6 +25,9 @@ const Create: NextPage = () => {
     const router = useRouter();
     const [createLive, {data, loading}] = useMutation<CreateResponse>(`/api/streams`);
 
+    console.log(createLive);
+    
+
     const { register, handleSubmit } = useForm<CreateForm>();
     const onValid = (form: CreateForm) => {
         if (loading) return;

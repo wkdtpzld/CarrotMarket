@@ -70,7 +70,14 @@ const LiveDetail: NextPage = () => {
             {data?.stream ? (
             <div className='py-10 space-y-4'>
                 <div className="pt-4 px-4">
-                    <div className='bg-slate-300 aspect-video rounded-md ' />
+                    <div className='bg-slate-300 aspect-video rounded-md' >
+                        <iframe
+                            className="w-full aspect-video rounded-md shadow-sm"
+                            src={`https://iframe.videodelivery.net/${data.stream.cloudflareId}`}
+                            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                            allowFullScreen={true}
+                        ></iframe>
+                    </div>
                     <h3 className='text-gray-800 font-bold text-2xl mt-5'>
                         {data?.stream.name}
                     </h3>
@@ -80,8 +87,22 @@ const LiveDetail: NextPage = () => {
                     <p className='my-6 text-gray-700'>
                         ${data?.stream.description}
                     </p>
+                    <div className='bg-orange-300 flex flex-col space-y-3 rounded-md overflow-scroll text-sm py-2 px-2' >
+                        <span>
+                            Stream Keys (secret)
+                        </span>
+                        <span className='text-white'>
+                                <span className='font-medium text-gray-700 select-none'>URL:
+                                </span>{data.stream.cloudflareUrl}
+                        </span>
+                        <span className='text-white'>
+                                <span className='font-medium text-gray-700 select-none'>Key:
+                                </span>{data.stream.cloudflareKey}
+                        </span>
+                    </div>
                 </div>
                 <div className='py-10 space-y-4 h-[50vh] pb-16 overflow-y-scroll scrollbar-hide'>
+                    <span className='px-4 text-3xl font-bold'>Live Chat</span>
                     {data?.stream?.messages.map((item) => (
                         <>
                             <ChattingBubble
