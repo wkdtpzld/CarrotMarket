@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { Product } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { ImageURL } from '../../libs/client/utils';
+import Image from 'next/image';
 
 interface UploadProductForm {
     name: string;
@@ -69,9 +70,12 @@ const Upload: NextPage = () => {
             <form className='px-4 py-16 space-y-4' onSubmit={handleSubmit(onValid)}>
                 <div>
                     {photoPreview
-                        ? <img
+                        ? <Image
                             src={photoPreview}
-                            className='w-full rounded-md aspect-video text-gray-600 object-contain' />
+                            className='w-full rounded-md aspect-video text-gray-600 object-contain'
+                            layout='fill'
+                            alt='preview'
+                        />
                         : (        
                         <label className='w-full flex items-center justify-center text-gray-600 hover:text-orange-400
                             border-2 border-dashed border-gray-300 h-48 rounded-md hover:border-orange-400'>

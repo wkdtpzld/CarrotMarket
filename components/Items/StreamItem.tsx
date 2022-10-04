@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css'
 
 interface IProps {
     Name: string;
@@ -8,7 +10,12 @@ interface IProps {
 }
 
 
+
 const StreamItem = ({Name, id, streamId}:IProps) => {
+
+    const onErrorHandler = (ev: any) => {
+        ev.target.style = "display: none"      
+    }
 
     return (
         <>
@@ -19,8 +26,9 @@ const StreamItem = ({Name, id, streamId}:IProps) => {
                         <Image
                             src={`https://videodelivery.net/${streamId}/thumbnails/thumbnail.jpg`}
                             layout="fill"
-                            alt={Name}
-                            >
+                            alt={String(id)}
+                            onError={onErrorHandler}
+                        >
                         </Image>
                     </div>
                 </a>

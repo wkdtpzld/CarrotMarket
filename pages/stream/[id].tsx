@@ -42,7 +42,12 @@ const LiveDetail: NextPage = () => {
         (router.query.id ? `/api/streams/${router.query.id}` : null, {
             refreshInterval: 1000
         });
-    const [sendMessage, {data:messageData, loading}] = useMutation(`/api/streams/${router.query.id}/message`);
+    const [sendMessage, { data: messageData, loading }]
+        = useMutation(`/api/streams/${router.query.id}/message`);
+    
+    const [deleteStream, { data: DeleteStreamData, loading: DeleteStreamLoading }]
+        = useMutation(`/api/streams/${router.query.id}`)
+
 
     const { register, handleSubmit, reset } = useForm<MessageForm>();
     const onValid = (form: MessageForm) => {
@@ -62,14 +67,18 @@ const LiveDetail: NextPage = () => {
             } as any, false);
         
         sendMessage(form);
+    }
 
+    const onClick = () => {
+        deleteStream("");
+        router.replace("/stream");
     }
 
     return (
         <Layout canGoBack>
             {data?.stream ? (
             <div className='py-10 space-y-4'>
-                <div className="pt-4 px-4">
+                <div className="pt-4 px-4 relative">
                     <div className='bg-slate-300 aspect-video rounded-md' >
                         <iframe
                             className="w-full aspect-video rounded-md shadow-sm"
@@ -100,6 +109,17 @@ const LiveDetail: NextPage = () => {
                                 </span>{data.stream.cloudflareKey}
                         </span>
                     </div>
+                        {data.stream.userId === user?.id
+                        ? (
+                            <button
+                                onClick={onClick}
+                                className='w-24 h-10 bg-orange-400 mt-3 rounded-md text-white text-sm absolute right-4'>
+                                라이브 종료
+                            </button>
+                        ): (
+                            null
+                        )}
+                    
                 </div>
                 <div className='py-10 space-y-4 h-[50vh] pb-16 overflow-y-scroll scrollbar-hide'>
                     <span className='px-4 text-3xl font-bold'>Live Chat</span>

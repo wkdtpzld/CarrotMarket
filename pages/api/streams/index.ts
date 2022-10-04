@@ -67,6 +67,7 @@ async function handler(
             stream
         })
     } else if (request.method === "GET") {
+
         const streamCount = await client.stream.count();
         const streams = await client.stream.findMany({
             take: 10,

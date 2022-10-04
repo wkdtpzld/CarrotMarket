@@ -22,39 +22,58 @@ async function handler(
         session: { user }
     } = request;
 
-    const stream = await client.stream.findUnique({
-        where: {
-            id: Number(id)
-        },
-        include: {
-            messages: {
-                select: {
-                    message: true,
-                    user: {
-                        select: {
-                            id: true,
-                            avator: true
+    if (request.method === "GET") {
+        const stream = await client.stream.findUnique({
+            where: {
+                id: Number(id)
+            },
+            include: {
+                messages: {
+                    select: {
+                        message: true,
+                        user: {
+                            select: {
+                                id: true,
+                                avator: true
+                            }
                         }
                     }
                 }
-            }
-        },
-        
-    });
-
-    const isOwner = stream?.userId === user?.id;
-    if (stream && !isOwner) {
-        stream.cloudflareKey = "xxxxx";
-        stream.cloudflareUrl = "xxxxx";
-    }
+            },
+            
+        });
     
-    response.json({
-        ok: true,
-        stream
-    })
+        const isOwner = stream?.userId === user?.id;
+        if (stream && !isOwner) {
+            stream.cloudflareKey = "xxxxx";
+            stream.cloudflareUrl = "xxxxx";
+        }
+        
+        response.json({
+            ok: true,
+            stream
+        })
+    } else if (request.method === "POST") {
+
+        if (user?.id !== Number(id)) {
+            response.status(403).json({
+                ok: false
+            })
+        }
+
+        await client.stream.delete({
+            where: {
+                id: Number(id)
+            }
+        });
+
+        response.json({
+            ok: true
+        });
+    }
 }
 
 export default withApiSession(withHandler({
-    method: ["GET"],
+    method: ["GET","POST"],
     fn: handler,
 }));

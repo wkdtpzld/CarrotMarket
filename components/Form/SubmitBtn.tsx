@@ -1,12 +1,15 @@
 
 interface IProps {
-    Content: string
+    Content: string;
+    onClick?: (ev: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const SubmitBtn = ({Content}:IProps) => {
+const SubmitBtn = ({Content, onClick}:IProps) => {
 
     return (
-        <button className="mt-6 bg-orange-500 hover:bg-orange-600 
+        <button
+            onClick={onClick}
+            className="mt-6 bg-orange-500 hover:bg-orange-600 
             text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium
             focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 focus:outline-none w-full" >
             {Content}

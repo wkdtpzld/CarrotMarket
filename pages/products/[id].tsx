@@ -9,7 +9,7 @@ import SubmitBtn from '@components/Form/SubmitBtn';
 
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
-import { Product, User } from '@prisma/client';
+import { ChatRoom, Product, User } from '@prisma/client';
 import useMutation from '@libs/client/useMutation';
 import { cls, ImageURL } from '@libs/client/utils';
 import useUser from '@libs/client/useUser';
@@ -30,16 +30,40 @@ interface ItemDetailResponse {
     error?: string;
 }
 
+interface ChatRoomResponse {
+    ok: boolean;
+    error?: string;
+    chatRoom : ChatRoom
+}
+
 const ItemDetail: NextPage = () => { 
 
     const router = useRouter();
-    const [status, setStatus] = useState(true);
-    const { user, isLoading } = useUser();
+    const { user } = useUser();
 
+    // 상품 관련
     const { data, mutate:boundMutate } = useSWR<ItemDetailResponse>
         (router.query.id ? `/api/products/${router.query.id}` : null);
     
+    
+    // 채팅 관련
+    const [createChatRoom, { data: chatData, loading: chatLoading, error: chatError }]
+        = useMutation<ChatRoomResponse>(`/api/chat`);
+    
+    const onClickChatRoom = () => {
+        if (chatLoading) return;
+        if (data?.product.userId === user?.id) {
+            return alert("자신의 물건은 구입할 수 없습니다.");
+        }
+        createChatRoom({ sellerId: data?.product.userId, productId: data?.product.userId });
 
+        if (chatData?.error) {
+            alert("이미 거래중 입니다.");    
+            return router.push(`/chats/${chatData.chatRoom.id}`);
+        }
+    }
+
+    // 좋아요 관련
     const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
     const onFavClick = () => {
         toggleFav({})
@@ -58,7 +82,7 @@ const ItemDetail: NextPage = () => {
                     <>
                     <div className='relative pb-96 mb-6'>      
                         <Image 
-                            src={ImageURL(data?.product.image!, "public")} 
+                            src={ImageURL(data?.product?.image!, "public")} 
                             className='h-96 bg-slate-300 mb-4 m-auto object-scale-down rounded-md' 
                             layout='fill'
                             alt={data?.product.name}
@@ -87,7 +111,9 @@ const ItemDetail: NextPage = () => {
                             </>
                         }
                         <div className='flex items-center justify-between space-x-2'>
-                            <SubmitBtn Content="Talk to seller" />
+                            <SubmitBtn
+                                onClick={onClickChatRoom}
+                                Content="Talk to seller" />
                             <motion.button
                                 whileTap={{scale:0.2}}
                                 onClick={onFavClick}

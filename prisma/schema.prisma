@@ -25,11 +25,13 @@ model User {
   posts           Post[]
   answers         Answer[]
   wondering       Wondering[]
-  writtenReviews  Review[] @relation(name: "writtenReviews")
-  recivedReviews  Review[] @relation(name: "recivedReviews")
+  writtenReviews  Review[]    @relation(name: "writtenReviews")
+  recivedReviews  Review[]    @relation(name: "recivedReviews")
   record          Record[]
   streams         Stream[]
   messages        Message[]
+  sellerCahtRoom  ChatRoom[]  @relation(name: "sellerCahtRoom")
+  buyerCahtRoom   ChatRoom[]  @relation(name: "buyerCahtRoom")
 }
 
 model Token {
@@ -52,6 +54,7 @@ model Product {
   price       Int 
   description String    @db.MediumText
   records     Record[]
+  chatRoom    ChatRoom[]
 }
 
 model Post {
@@ -139,6 +142,21 @@ model Message {
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
   message     String      @db.MediumText
-  stream      Stream        @relation(fields: [streamId], references: [id], onDelete: Cascade)
+  stream      Stream?     @relation(fields: [streamId], references: [id], onDelete: Cascade)
   streamId    Int
+  chatRoom    ChatRoom?   @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  chatRoomId  Int
+}
+
+model ChatRoom {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  seller        User        @relation(name:"sellerCahtRoom", fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId      Int
+  buyer         User        @relation(name:"buyerCahtRoom", fields: [buyerId], references: [id], onDelete: Cascade)
+  buyerId       Int
+  product       Product     @relation(fields: [productId], references: [id])
+  productId     Int
+  message       Message[]
 }
