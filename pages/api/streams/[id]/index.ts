@@ -36,7 +36,8 @@ async function handler(
                                 id: true,
                                 avator: true
                             }
-                        }
+                        },
+                        id: true
                     }
                 }
             },

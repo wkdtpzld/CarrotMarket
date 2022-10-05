@@ -64,7 +64,8 @@ async function handler(
                             where: {
                                 kind: 'Fav'
                             }
-                        }
+                        },
+                        chatRoom: true
                     },
                 }
             },

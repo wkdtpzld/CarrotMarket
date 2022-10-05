@@ -3,23 +3,24 @@ import SilmilarItem from '@components/Items/SimilarItem';
 import Layout from '@components/Common/Layout';
 import ProfileBox from '@components/Common/ProfileBox';
 import { useRouter } from 'next/router';
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 import Link from 'next/link';
 import SubmitBtn from '@components/Form/SubmitBtn';
 
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
-import { ChatRoom, Product, User } from '@prisma/client';
+import { ChatRoom, Product, Review, User } from '@prisma/client';
 import useMutation from '@libs/client/useMutation';
 import { cls, ImageURL } from '@libs/client/utils';
 import useUser from '@libs/client/useUser';
 import {motion} from 'framer-motion';
 import NotFound from '@components/Common/NotFound';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
 
 interface ProductWithUser extends Product {
     user: User;
+    review: Review
 }
 
 interface ItemDetailResponse {
@@ -60,8 +61,15 @@ const ItemDetail: NextPage = () => {
         if (chatData?.error) {
             alert("이미 거래중 입니다.");    
             return router.push(`/chats/${chatData.chatRoom.id}`);
-        }
+        };
     }
+
+    useEffect(() => {
+        if (chatData && !chatLoading) {
+            router.push(`/chats/${chatData.chatRoom.id}`);
+        }
+    }, [chatData, router, chatLoading]);
+
 
     // 좋아요 관련
     const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
@@ -76,6 +84,15 @@ const ItemDetail: NextPage = () => {
     
     return (
         <Layout canGoBack>
+            {data?.product.review ? (
+                <div className='flex absolute w-full h-full bg-black z-50 opacity-70'>
+                    <span className='relative font-bold text-white flex justify-center items-center m-auto text-2xl z-50'>
+                        거래가 종료된 상품입니다.
+                    </span>
+                </div>
+            ): (
+                null
+            )}
             <div className='px-4 py-10 '>
                 <div className=''>
                     {!data?.error && data?.product !== null ? (

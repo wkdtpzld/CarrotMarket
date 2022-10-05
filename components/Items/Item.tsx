@@ -1,3 +1,5 @@
+import { ImageURL } from "@libs/client/utils";
+import Image from "next/image";
 import Link from "next/link";
 
 interface IProps {
@@ -7,15 +9,30 @@ interface IProps {
     Like: number;
     ChatCount?: number;
     id: number;
+    image: string;
 }
 
-const Item = ({Name, Category, Price, Like, ChatCount, id}:IProps) => {
+const Item = ({Name, Category, Price, Like, ChatCount, id, image}:IProps) => {
+
+    const onErrorHandler = (ev: any) => {
+        ev.target.style = "display: none"      
+    }
+
 
     return (
         <Link href={`/products/${id}`}>
             <div className="flex py-4 cursor-pointer justify-between ">
                 <div className='flex space-x-4'>
-                    <div className='w-20 h-20 bg-gray-400 rounded-md'/>
+                    <div className='w-20 h-20 bg-gray-400 rounded-md'>
+                        <Image
+                            src={ImageURL(image, "public")}
+                            width={80}
+                            height={80}
+                            alt={Name}
+                            className='rounded-md'
+                            onError={onErrorHandler}
+                        />
+                    </div>
                     <div className='pt-2 flex flex-col'>
                         <h3 className='text-sm font-medium text-gray-800'>{Name}</h3>
                         <span className='text-xs text-gray-500'>{Category}</span>

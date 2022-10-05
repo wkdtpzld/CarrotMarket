@@ -16,7 +16,7 @@ interface StreamMessage {
     message: string;
     id: number;
     user: {
-        avatar?: string;
+        avator?: string;
         id: number
     }
 }
@@ -42,6 +42,7 @@ const LiveDetail: NextPage = () => {
         (router.query.id ? `/api/streams/${router.query.id}` : null, {
             refreshInterval: 1000
         });
+    
     const [sendMessage, { data: messageData, loading }]
         = useMutation(`/api/streams/${router.query.id}/message`);
     
@@ -124,13 +125,13 @@ const LiveDetail: NextPage = () => {
                 <div className='py-10 space-y-4 h-[50vh] pb-16 overflow-y-scroll scrollbar-hide'>
                     <span className='px-4 text-3xl font-bold'>Live Chat</span>
                     {data?.stream?.messages.map((item) => (
-                        <>
+                        <div key={item.id} className="py-4">
                             <ChattingBubble
-                                key={item.id}
+                                imageId={item.user.avator!}
                                 Message={item.message}
                                 type={user?.id === item.user.id ? 'inside' : 'opposite'}
                             />
-                        </>
+                        </div>
                     ))}
                 </div>
                 <InputSubmitBtn

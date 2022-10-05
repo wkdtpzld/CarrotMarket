@@ -18,7 +18,7 @@ export default function Layout({ title, canGoBack, hasTabBar, children }: Layout
 
     return (
         <div>
-            <div className={cls("bg-white w-full text-lg font-medium px-10 py-3 fixed text-gray-700 border-b top-0 flex items-center max-w-xl"
+            <div className={cls("bg-white w-full text-lg font-medium px-10 py-3 fixed text-gray-700 border-b top-0 flex items-center max-w-xl z-50"
                 , !canGoBack ? "justify-center" : "")}>
                 {canGoBack ?
                     <button onClick={onClick}>

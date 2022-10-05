@@ -70,12 +70,15 @@ const Upload: NextPage = () => {
             <form className='px-4 py-16 space-y-4' onSubmit={handleSubmit(onValid)}>
                 <div>
                     {photoPreview
-                        ? <Image
-                            src={photoPreview}
-                            className='w-full rounded-md aspect-video text-gray-600 object-contain'
-                            layout='fill'
-                            alt='preview'
-                        />
+                        ?
+                        <div className='relative w-full rounded-md aspect-video text-gray-600 object-contain'>
+                            <Image
+                                src={photoPreview}
+                                className='w-full rounded-md text-gray-600 object-contain'
+                                layout='fill'
+                                alt='preview'
+                            />
+                        </div>
                         : (        
                         <label className='w-full flex items-center justify-center text-gray-600 hover:text-orange-400
                             border-2 border-dashed border-gray-300 h-48 rounded-md hover:border-orange-400'>

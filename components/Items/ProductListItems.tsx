@@ -10,7 +10,8 @@ interface IProps {
 
 interface ProductWithCount extends Product {
     _count: {
-        records: number
+        records: number,
+        chatRoom: number,
     }
 }
 
@@ -36,13 +37,14 @@ const ProductListItems = ({kind}:IProps) => {
                     <>
                         {data?.records.map((record) => (
                             <Item
+                                image={record.product.image}
                                 key={record?.id}
                                 id={record?.id}
                                 Name={record?.product?.name}
                                 Category='category'
                                 Price={record?.product?.price}
                                 Like={record?.product._count.records}
-                                ChatCount={3}
+                                ChatCount={record.product._count.chatRoom}
                             />
                         ))}
                     </>

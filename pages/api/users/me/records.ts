@@ -29,7 +29,8 @@ async function handler(
                                 where: {
                                     kind
                                 }
-                            }
+                            },
+                            chatRoom: true
                         }
                     }
                 }

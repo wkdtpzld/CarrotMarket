@@ -25,7 +25,8 @@ async function handler(
                     name: true,
                     avator: true
                 }
-            }
+            },
+            review: true
         }
     })
 

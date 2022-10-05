@@ -13,3 +13,7 @@ export enum MenuIconType {
 export function ImageURL(id: string, variants: string) {
     return `https://imagedelivery.net/RM-gWCqJD05KKEeoevZoKA/${id}/${variants}`
 }
+
+export function dateFormat(date: Date) {
+    return date.toString().slice(0, 10);
+}

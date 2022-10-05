@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 interface ProductsWithHeart extends Product {
   _count: {
     records: number;
+    chatRoom: number;
   }
 }
 
@@ -54,12 +55,13 @@ const Home: NextPage = () => {
               {products.map((product) => (
                 <Item
                   key={product.id}
+                  image={product.image}
                   id={product.id}
                   Name={product.name}
                   Category={product.price + ""}
                   Price={product.price}
                   Like={product._count.records}
-                  ChatCount={2} />
+                  ChatCount={product._count.chatRoom} />
               ))}
             </>
           ) : (

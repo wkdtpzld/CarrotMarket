@@ -55,6 +55,8 @@ model Product {
   description String    @db.MediumText
   records     Record[]
   chatRoom    ChatRoom[]
+  reservation Reservation?
+  review      Review?
 }
 
 model Post {
@@ -101,6 +103,8 @@ model Review {
   createdFor    User        @relation(name:"recivedReviews", fields: [createdForId], references: [id], onDelete: Cascade)
   createdForId  Int
   score         Int         @default(1)
+  product       Product     @relation(fields: [productId], references: [id])
+  productId     Int         @unique
 }
 
 model Record {
@@ -143,9 +147,9 @@ model Message {
   userId      Int
   message     String      @db.MediumText
   stream      Stream?     @relation(fields: [streamId], references: [id], onDelete: Cascade)
-  streamId    Int
+  streamId    Int?
   chatRoom    ChatRoom?   @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
-  chatRoomId  Int
+  chatRoomId  Int?
 }
 
 model ChatRoom {
@@ -159,4 +163,16 @@ model ChatRoom {
   product       Product     @relation(fields: [productId], references: [id])
   productId     Int
   message       Message[]
+  reservation   Reservation?
+}
+
+model Reservation {
+  id                Int         @id @default(autoincrement())
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  reservationDate   DateTime    
+  product           Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId         Int         @unique
+  chatRoom          ChatRoom    @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  chatRoomId        Int         @unique
 }
