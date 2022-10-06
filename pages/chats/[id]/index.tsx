@@ -1,8 +1,8 @@
-import type { NextPage } from 'next'
+import type { GetServerSideProps, NextPage, NextPageContext } from 'next'
 import InputSubmitBtn from '@components/Form/InputSubmitBtn';
 import Layout from '@components/Common/Layout';
 import ChattingBubble from '@components/Items/ChattingBubble';
-import useSWR from 'swr';
+import useSWR, { SWRConfig } from 'swr';
 import { useRouter } from 'next/router';
 import { ChatRoom, Message, Product, Reservation, User } from '@prisma/client';
 import useUser from '@libs/client/useUser';
@@ -14,6 +14,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Link from 'next/link';
+import client from '@libs/server/client';
 
 interface MessageWithUser extends Message {
     user: User
@@ -57,6 +58,9 @@ const ChatDetail: NextPage = () => {
         (router.query.id ? `/api/chat/${router.query.id}` : null, {
             refreshInterval: 1000
         });
+    
+    console.log(data);
+    
     
     if (!data?.ok && data) {
         router.push(`/`)
@@ -124,25 +128,25 @@ const ChatDetail: NextPage = () => {
                 <div className='h-20 flex border-b items-center justify-between fixed bg-white w-full z-50 -mt-4'>
                     <div className='space-x-4 ml-4 flex '>
                         <Image
-                            src={ImageURL(data.messages.product.image, "avatar")}
+                            src={ImageURL(data.messages.product?.image, "avatar")}
                             className='w-10 h-10 bg-slate-300 rounded-full -z-10'
                             width={40}
                             height={40}
                             alt={String(data.messages.productId)}
                         />
                         <div className='text-sm flex flex-col'>
-                            <span className='text-gray-700'>{data.messages.product.name}</span>
-                            <span className='text-xl font-semibold'>$ {data.messages.product.price}</span>
+                            <span className='text-gray-700'>{data.messages.product?.name}</span>
+                            <span className='text-xl font-semibold'>$ {data.messages.product?.price}</span>
                         </div>
                     </div>
-                    {data.messages.product.userId === user?.id ? (
+                    {data.messages.product?.userId === user?.id ? (
                         <div className='flex z-20'> 
                             <DatePicker selected={date} onChange={(date:Date) => setDate(date)} className="w-28 h-12 rounded-md"/>
                             <button
-                                onClick={!data.messages.product.reservation ? onClickCreateReservation : onClickDeleteReservation}
+                                onClick={!data.messages.product?.reservation ? onClickCreateReservation : onClickDeleteReservation}
                                 className='w-36 h-12 bg-orange-300 mr-4 rounded-md hover:bg-orange-500 transition'>
                                 <span className='text-gray-800 text-sm font-semibold'>
-                                    {data.messages.product.reservation ? "예약 취소" : "예약하기"}
+                                    {data.messages.product?.reservation ? "예약 취소" : "예약하기"}
                                 </span>
                             </button>
                         </div>
@@ -151,7 +155,7 @@ const ChatDetail: NextPage = () => {
                     )}
                 </div>
                 <div className='px-4 py-10 space-y-4 my-14'>
-                    {data?.messages.message.map(message => (
+                    {data?.messages.message?.map(message => (
                         <ChattingBubble
                             key={message.id}
                             Message={message.message}
@@ -159,13 +163,13 @@ const ChatDetail: NextPage = () => {
                             imageId={message.user.avator!}
                         />
                     ))}
-                    {data.messages.product.reservation ? (
+                    {data.messages.product?.reservation ? (
                         <>
-                        {new Date(data?.messages.product.reservation.reservationDate!) > new Date()
+                        {new Date(data?.messages.product?.reservation.reservationDate!) > new Date()
                             ? (
                             <div className='flex items-center justify-center mt-6 relative'>
                                 <span className='text-sm font-semibold'>
-                                    {dateFormat(data.messages.product.reservation.reservationDate)}
+                                    {dateFormat(data.messages.product?.reservation.reservationDate)}
                                 </span>
                                 <span className='text-sm'>
                                     일 거래 예약날입니다.
@@ -210,4 +214,70 @@ const ChatDetail: NextPage = () => {
     )
 }
 
-export default ChatDetail;
+const Page: NextPage<{messages:ChatRoomWithMessage, isDone:boolean}> = ({messages, isDone}) => {
+    
+    const router = useRouter();
+
+    return (
+        <SWRConfig
+            value={{
+                fallback: {
+                    [`/api/chat/${router.query.id}`] : {
+                        ok: true,
+                        messages,
+                        isDone
+                    }
+                }
+            }}
+        >
+            <ChatDetail />
+        </SWRConfig>
+    )
+}
+
+export async function getServerSideProps(ctx:any) {
+
+    const messages = await client.chatRoom.findUnique({
+        where: {
+            id: Number(ctx.query.id),
+        },
+        include: {
+            message: {
+                select: {
+                    message: true,
+                    user: {
+                        select: {
+                            avator: true,
+                            id: true
+                        }
+                    },
+                    id: true
+                },
+                take: 2
+            },
+            product: {
+                include: {
+                    reservation: true
+                }
+            },
+        }
+    });
+
+    const isDone = Boolean(await client.review.findFirst({
+        where: {
+            productId: messages?.productId
+        },
+        select: {
+            id: true
+        }
+    }));
+
+    return {
+        props: {
+            messages: JSON.parse(JSON.stringify(messages)),
+            isDone
+        }
+    }
+}
+
+export default Page;

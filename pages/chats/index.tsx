@@ -23,9 +23,6 @@ const Chats: NextPage = () => {
 
     const { data } = useSWR<ChatRoomsResponse>(`api/chat`);
 
-    console.log(data);
-    
-
     return (
         <Layout title='채팅' hasTabBar>
             <div className='py-10 divide-y-2'>

@@ -14,10 +14,11 @@ async function handler(
         query: { kind }
     } = request;
 
-
+    
     const records = await client.record.findMany({
         where: {
             userId: user?.id,
+            //@ts-ignore
             kind
         },
         include: {
@@ -27,6 +28,7 @@ async function handler(
                         select: {
                             records: {
                                 where: {
+                                    //@ts-ignore
                                     kind
                                 }
                             },

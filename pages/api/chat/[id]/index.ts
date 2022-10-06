@@ -54,7 +54,6 @@ async function handler(
                         reservation: true
                     }
                 },
-                
             }
         });
         

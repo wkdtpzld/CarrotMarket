@@ -1,15 +1,18 @@
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { cls, MenuIconType } from '../../libs/client/utils';
 import TabBarMenu from './TabBarMenu';
+
 interface LayoutProps {
     children: React.ReactNode
     title?: string;
     canGoBack?: boolean;
     hasTabBar?: boolean;
+    seoTitle?: string;
 }
 
-export default function Layout({ title, canGoBack, hasTabBar, children }: LayoutProps) {
+export default function Layout({ title, canGoBack, hasTabBar, children, seoTitle }: LayoutProps) {
     
     const router = useRouter();
     const onClick = () => {
@@ -18,6 +21,9 @@ export default function Layout({ title, canGoBack, hasTabBar, children }: Layout
 
     return (
         <div>
+            <Head>
+                <title>{seoTitle}</title>
+            </Head>
             <div className={cls("bg-white w-full text-lg font-medium px-10 py-3 fixed text-gray-700 border-b top-0 flex items-center max-w-xl z-50"
                 , !canGoBack ? "justify-center" : "")}>
                 {canGoBack ?

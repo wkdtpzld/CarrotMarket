@@ -66,7 +66,7 @@ const Upload: NextPage = () => {
     }, [photo])
 
     return (
-        <Layout canGoBack>
+        <Layout canGoBack seoTitle='uploadProduct | Carrot Market'>
             <form className='px-4 py-16 space-y-4' onSubmit={handleSubmit(onValid)}>
                 <div>
                     {photoPreview

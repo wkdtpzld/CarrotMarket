@@ -44,10 +44,7 @@ const Home: NextPage = () => {
   }, [setSize, page])
 
   return (
-    <Layout title='홈' hasTabBar>
-      <Head>
-        <title>Home</title>
-      </Head>
+    <Layout title='홈' hasTabBar seoTitle='Products | Carrot Market'>
       <div className='flex px-4 flex-col divide-y-2'>
         {
           data ? (
