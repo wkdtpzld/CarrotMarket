@@ -59,15 +59,11 @@ const ChatDetail: NextPage = () => {
             refreshInterval: 1000
         });
     
-    console.log(data);
-    
-    
     if (!data?.ok && data) {
         router.push(`/`)
     }
 
     // Reservation 관련
-
     const [reservation, { data: reservationData, loading: reservationLoading }]
         = useMutation<ReservationResponse>(`/api/chat/${router.query.id}/reservation`);
     
@@ -122,7 +118,7 @@ const ChatDetail: NextPage = () => {
 
     return (
         <Layout canGoBack>
-            {data?.ok && !data.isDone ?
+            {data?.messages && data?.ok && !data.isDone ?
                 (
                 <>
                 <div className='h-20 flex border-b items-center justify-between fixed bg-white w-full z-50 -mt-4'>
@@ -214,70 +210,4 @@ const ChatDetail: NextPage = () => {
     )
 }
 
-const Page: NextPage<{messages:ChatRoomWithMessage, isDone:boolean}> = ({messages, isDone}) => {
-    
-    const router = useRouter();
-
-    return (
-        <SWRConfig
-            value={{
-                fallback: {
-                    [`/api/chat/${router.query.id}`] : {
-                        ok: true,
-                        messages,
-                        isDone
-                    }
-                }
-            }}
-        >
-            <ChatDetail />
-        </SWRConfig>
-    )
-}
-
-export async function getServerSideProps(ctx:any) {
-
-    const messages = await client.chatRoom.findUnique({
-        where: {
-            id: Number(ctx.query.id),
-        },
-        include: {
-            message: {
-                select: {
-                    message: true,
-                    user: {
-                        select: {
-                            avator: true,
-                            id: true
-                        }
-                    },
-                    id: true
-                },
-                take: 2
-            },
-            product: {
-                include: {
-                    reservation: true
-                }
-            },
-        }
-    });
-
-    const isDone = Boolean(await client.review.findFirst({
-        where: {
-            productId: messages?.productId
-        },
-        select: {
-            id: true
-        }
-    }));
-
-    return {
-        props: {
-            messages: JSON.parse(JSON.stringify(messages)),
-            isDone
-        }
-    }
-}
-
-export default Page;
+export default ChatDetail;

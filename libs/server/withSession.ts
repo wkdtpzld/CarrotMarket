@@ -1,4 +1,4 @@
-import { withIronSessionApiRoute } from "iron-session/next"
+import { withIronSessionApiRoute, withIronSessionSsr } from "iron-session/next"
 
 const cookieOptions = {
     cookieName: "carrotSession",
@@ -7,4 +7,8 @@ const cookieOptions = {
 
 export function withApiSession(fn:any) {
     return withIronSessionApiRoute(fn, cookieOptions);
+}
+
+export function withSsrSession(fn: any) {
+    return withIronSessionSsr(fn, cookieOptions);
 }

@@ -9,3 +9,19 @@
 body {
     font-family: 'Noto Sans KR', sans-serif;
 }
+
+.blog-post-content {
+    @apply mx-4
+}
+
+.blog-post-content h1 {
+    @apply text-red-500 mb-5;
+}
+
+.blog-post-content p {
+    @apply mb-1 text-gray-700
+}
+
+.blog-post-content ul {
+    @apply pl-10 list-disc
+}
