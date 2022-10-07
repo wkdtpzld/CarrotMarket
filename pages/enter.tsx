@@ -38,7 +38,6 @@ export default function Enter() {
     const onTokenValid = (validData: EnterForm) => {
         if (tokenLoading) return;
         confirmToken(validData);
-
     }
 
     // Email || Phone
@@ -58,7 +57,7 @@ export default function Enter() {
     const router = useRouter();
 
     useEffect(() => {
-        if (tokenData?.ok) {
+        if (tokenData) {
             router.push("/");
         }
     }, [tokenData, router]);
