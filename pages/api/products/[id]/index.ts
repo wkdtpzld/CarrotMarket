@@ -14,6 +14,14 @@ async function handler(
         session: { user }
     } = request;
     
+    
+    if (Number.isNaN(id)) {
+        return response.json({
+            ok: false
+        })
+    }
+    
+
     const product = await client.product.findUnique({
         where: {
             id: Number(id),

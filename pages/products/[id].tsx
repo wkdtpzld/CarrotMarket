@@ -208,7 +208,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         }
     };
 
-    if (Number.isNaN(Number(ctx.params.id))) {
+    if (Number.isNaN(+ctx.params.id)) {
         return {
             props: {}
         }

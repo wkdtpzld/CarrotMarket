@@ -1,4 +1,4 @@
-import type { NextPage } from 'next'
+import type { GetStaticPaths, GetStaticProps, GetStaticPropsContext, NextPage } from 'next'
 import CommentItem from '@components/Items/CommentItem';
 import Layout from '@components/Common/Layout';
 import ProfileBox from '@components/Common/ProfileBox';
@@ -9,13 +9,13 @@ import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { Answer, Post, User } from '@prisma/client';
 
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css'
 import useMutation from '../../libs/client/useMutation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import NotFound from '@components/Common/NotFound';
+import client from '@libs/server/client';
+import { SWRConfig, unstable_serialize } from 'swr';
 
 interface AnswerWithUser extends Answer{
     user: User;
@@ -34,6 +34,7 @@ interface CommunityPostResponse {
     ok: boolean;
     post: PostWithUser;
     isWondering: boolean;
+    id?: number
     onClick?: (ev: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -54,6 +55,7 @@ const CommunityDetail: NextPage = () => {
     
     const [wonder, { loading }]
         = useMutation(`/api/posts/${router.query.id}/wonder`);
+
     const [sendAnswer, { data: answerData, loading: answerLoading }]
         = useMutation<AnswerResponse>(`/api/posts/${router.query.id}/answers`);
 
@@ -98,23 +100,13 @@ const CommunityDetail: NextPage = () => {
                         Name={data?.post?.user?.name!}
                         isMine={false}
                         id={data?.post?.userId!}
+                        imageId={data?.post.user.avator!}
                     />
                 </div>
                 <div className='px-4 pb-2'>
-                    {data ? (
-                        <>
-                        <div className='mt-2 text-gray-700'>
-                            <span className='text-orange-500 font-medium mr-2'>Q.</span> {data?.post?.question}
-                        </div>
-                        </>
-                    ) : (
-                        <>
-                        <div className='mt-2'>
-                            <span className='text-orange-500 font-medium mr-2'>Q.</span>
-                            <Skeleton width={350} />
-                        </div>
-                        </>    
-                    )}
+                    <div className='mt-2 text-gray-700'>
+                        <span className='text-orange-500 font-medium mr-2'>Q.</span> {data?.post?.question}
+                    </div>
                 </div>
                 <CommunityItemIcon
                     Answer={data?.post?._count?.answers!}
@@ -122,35 +114,14 @@ const CommunityDetail: NextPage = () => {
                     isWondering={data?.isWondering}
                     onClick={onWonderClick}
                 />
-                {data
-                    ? (
-                    <>
-                        {data?.post.answers.map((answer) => (
-                            <CommentItem
-                                key={answer.id}
-                                Name={answer.user.name}
-                                Date={answer.createdAt.toString()}
-                                Comment={answer.answer}
-                            />   
-                        ))}
-                    </>
-                    ) : (
-                    <>
-                        {[1, 1, 1, 1].map((_, i) => (
-                        <div className='px-4 flex items-start space-x-3 my-5' key={i}>
-                            <Skeleton width={32} height={32} circle className='py-4'/>
-                            <div className='space-y-2'>
-                                <Skeleton width={100} height={10} />
-                                <Skeleton width={150} height={8} className="pt-1" />
-                                <Skeleton width={300} height={15} />
-                            </div>
-                        </div>
-                        ))}
-                    </>
-                    )
-                }
-                
-                    
+                {data?.post.answers.map((answer) => (
+                    <CommentItem
+                        key={answer.id}
+                        Name={answer.user.name}
+                        Date={answer.createdAt.toString()}
+                        Comment={answer.answer}
+                    />   
+                ))}
                 <form className='px-4' onSubmit={handleSubmit(onValid)}>
                     <TextArea
                         Placeholder='Answer this question'
@@ -180,4 +151,100 @@ const CommunityDetail: NextPage = () => {
     )
 }
 
-export default CommunityDetail;
+const Page: NextPage<CommunityPostResponse> = ({ id, post, isWondering }) => {
+	return (
+		<SWRConfig
+			value={{
+				fallback: {
+					[unstable_serialize(`/api/posts/${id}`)]: {
+						ok: true,
+						post,
+						isWondering,
+					},
+				},
+			}}
+		>
+			<CommunityDetail />
+		</SWRConfig>
+	);
+};
+
+export default Page;
+
+export const getStaticPaths: GetStaticPaths = () => {
+
+    return {
+        paths: [],
+        fallback: "blocking"
+    }
+}
+
+export const getStaticProps: GetStaticProps = async (ctx:GetStaticPropsContext) => {
+
+    if (!ctx?.params?.id) {
+        return {
+            props: {}
+        }
+    };
+
+    if (Number.isNaN(+ctx.params.id)) {
+        return {
+            props: {}
+        }
+    }
+
+    const id = ctx.params.id;
+
+    const post = await client.post.findUnique({
+        where: {
+            id: Number(ctx?.params?.id)
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    avator: true
+                }
+            },
+            answers: {
+                select: {
+                    answer: true,
+                    id: true,
+                    createdAt: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            avator: true
+                        }
+                    }
+                }
+            },
+            _count: {
+                select: {
+                    answers: true,
+                    wondering: true
+                }
+            }
+        },
+    });
+
+    const isWondering = Boolean(await client.wondering.findFirst({
+        where: {
+            postId: Number(ctx?.params?.id),
+            userId: post?.id
+        },
+        select: {
+            id: true
+        }
+    }))
+
+    return {
+        props: {
+            post: JSON.parse(JSON.stringify(post)),
+            isWondering,
+            id
+        }
+    }
+}
