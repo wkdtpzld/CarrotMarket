@@ -38,24 +38,24 @@ async function handler(
     });
 
     if (phone) {
-        // const message = await twilioClient.messages.create({
-        //     messagingServiceSid: process.env.TWILIO_MSID,
-        //     to: "+82" + phone,
-        //     body: `Your login token is ${payload}`
-        // })
+        const message = await twilioClient.messages.create({
+            messagingServiceSid: process.env.TWILIO_MSID,
+            to: "+82" + phone,
+            body: `Your login token is ${payload}`
+        })
     } else if (email) {
-        // const mailOption = {
-        //     from: process.env.MAIL_ID,
-        //     to: email,
-        //     subject: "Carrot Market OTP Email",
-        //     text: `Your OTP Code: ${payload} `
-        // };
+        const mailOption = {
+            from: process.env.MAIL_ID,
+            to: email,
+            subject: "Carrot Market OTP Email",
+            text: `Your OTP Code: ${payload} `
+        };
 
-        // const result = await smtpTransport.sendMail(
-        //     mailOption,
-        // )
+        const result = await smtpTransport.sendMail(
+            mailOption,
+        )
 
-        // smtpTransport.close();
+        smtpTransport.close();
         
     }
 
