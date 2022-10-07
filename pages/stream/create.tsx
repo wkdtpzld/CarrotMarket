@@ -24,11 +24,7 @@ const Create: NextPage = () => {
 
     const router = useRouter();
     const [createLive, {data, loading}] = useMutation<CreateResponse>(`/api/streams`);
-
-    console.log(createLive);
-    
-
-    const { register, handleSubmit } = useForm<CreateForm>();
+    const { register, handleSubmit, formState: {errors} } = useForm<CreateForm>();
     const onValid = (form: CreateForm) => {
         if (loading) return;
         createLive(form);
@@ -53,8 +49,13 @@ const Create: NextPage = () => {
                             required: {
                                 value: true,
                                 message: "제목을 입력 해주세요"
-                            } 
+                            },
+                            minLength: {
+                                value: 5,
+                                message: "라이브 제목은 최소 5자 이상으로 입력해주세요. "
+                            }
                         })}
+                        error={errors.name}
                     />
                 </div>
                 <div>
@@ -68,8 +69,12 @@ const Create: NextPage = () => {
                                 value: true,
                                 message: '가격을 입력해 주세요'
                             },
-                            valueAsNumber: true
+                            maxLength: {
+                                value: 7,
+                                message: "가격이 너무 높게 설정되어있습니다."
+                            }
                         })}
+                        error={errors.price}
                     />
                 </div>
                 <TextArea
@@ -79,8 +84,13 @@ const Create: NextPage = () => {
                         minLength: {
                             value: 10,
                             message: "설명은 최소 10글자 이상이어야 합니다."
+                        },
+                        required: {
+                            value: true,
+                            message: "상품 설명을 입력해 주세요."
                         }
                     })}
+                    error={errors.description}
                 />
                 <SubmitBtn
                     Content='Go Live'

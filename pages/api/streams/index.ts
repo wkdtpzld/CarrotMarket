@@ -48,7 +48,9 @@ async function handler(
 
         const stream = await client.stream.create({
             data: {
-                name, price, description,
+                name,
+                price: +price,
+                description,
                 cloudflareId: uid,
                 cloudflareKey: streamKey,
                 cloudflareUrl: url,
