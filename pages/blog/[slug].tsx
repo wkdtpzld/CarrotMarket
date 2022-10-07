@@ -16,15 +16,11 @@ const PostDetail: NextPage<{post:string}> = ({post}) => {
 
 export function getStaticPaths() {
 
-    const file = readdirSync("./posts").map((file) => {
-        const [name, extension] = file.split(".");
-        return { params: {slug: name} };
-    })
-    
+
 
     return {
-        paths: file,
-        fallback: false,
+        paths: [],
+        fallback: "blocking"
     }
 }
 

@@ -1,4 +1,4 @@
-import type { NextPage } from 'next'
+import type { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import SilmilarItem from '@components/Items/SimilarItem';
 import Layout from '@components/Common/Layout';
 import ProfileBox from '@components/Common/ProfileBox';
@@ -6,9 +6,6 @@ import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import Link from 'next/link';
 import SubmitBtn from '@components/Form/SubmitBtn';
-
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css'
 import { ChatRoom, Product, Review, User } from '@prisma/client';
 import useMutation from '@libs/client/useMutation';
 import { cls, ImageURL } from '@libs/client/utils';
@@ -17,6 +14,7 @@ import {motion} from 'framer-motion';
 import NotFound from '@components/Common/NotFound';
 import { useEffect } from 'react';
 import Image from 'next/image';
+import client from '@libs/server/client';
 
 interface ProductWithUser extends Product {
     user: User;
@@ -37,7 +35,7 @@ interface ChatRoomResponse {
     chatRoom : ChatRoom
 }
 
-const ItemDetail: NextPage = () => { 
+const ItemDetail: NextPage<ItemDetailResponse> = ({product, relatedProducts}) => { 
 
     const router = useRouter();
     const { user } = useUser();
@@ -53,10 +51,10 @@ const ItemDetail: NextPage = () => {
     
     const onClickChatRoom = () => {
         if (chatLoading) return;
-        if (data?.product.userId === user?.id) {
+        if (product.userId === user?.id) {
             return alert("자신의 물건은 구입할 수 없습니다.");
         }
-        createChatRoom({ sellerId: data?.product.userId, productId: data?.product.userId });
+        createChatRoom({ sellerId: product.userId, productId: product.userId });
 
         if (chatData?.error) {
             alert("이미 거래중 입니다.");    
@@ -84,9 +82,9 @@ const ItemDetail: NextPage = () => {
     
     return (
         <Layout canGoBack seoTitle='Product Detail | Carrot Market'>
-            {!data?.error && data?.product !== null ? (
+            {product ? (
             <>
-                {data?.product.review ? (
+                {product?.review ? (
                 <div className="flex absolute w-full h-full bg-black z-50 opacity-70">
                     <span className="relative font-bold text-white flex justify-center items-center m-auto text-2xl z-50">
                     거래가 종료된 상품입니다.
@@ -97,38 +95,28 @@ const ItemDetail: NextPage = () => {
                 <div className="">
                     <div className="relative pb-96 mb-6">
                     <Image
-                        src={ImageURL(data?.product?.image!, "public")}
+                        src={ImageURL(product?.image!, "public")}
                         className="h-96 bg-slate-300 mb-4 m-auto object-scale-down rounded-md"
                         layout="fill"
-                        alt={data?.product.name}
+                        alt={product?.name}
                     />
                     </div>
                     <ProfileBox
-                    Name={data?.product?.user.name!}
+                    Name={product?.user.name!}
                     isMine={false}
-                    id={data?.product?.userId!}
-                    imageId={data?.product.user.avator!}
+                    id={product?.userId!}
+                    imageId={product.user.avator!}
                     />
                     <div className="mt-10">
-                    {!data ? (
-                        <>
-                        <Skeleton height={36} />
-                        <Skeleton className="mt-3 mb-5" height={30} />
-                        <Skeleton className="" count={2} />
-                        </>
-                    ) : (
-                        <>
                         <h1 className="text-3xl font-bold text-gray-800">
-                            {data?.product?.name}
+                            {product?.name}
                         </h1>
                         <span className="text-3xl mt-3 block">
-                            ${data?.product?.price}
+                            ${product?.price}
                         </span>
                         <p className="text-base my-6 text-gray-700">
-                            {data?.product?.description}
+                            {product?.description}
                         </p>
-                        </>
-                    )}
                     <div className="flex items-center justify-between space-x-2">
                         <SubmitBtn
                         onClick={onClickChatRoom}
@@ -183,8 +171,7 @@ const ItemDetail: NextPage = () => {
                         Similar items
                     </h2>
                     <div className="grid grid-cols-2 gap-4 mt-6">
-                        {data
-                        ? data.relatedProducts?.map((item) => (
+                        {relatedProducts?.map((item) => (
                             <Link key={item.id} href={`/products/${item.id}`}>
                                 <a>
                                 <SilmilarItem
@@ -193,24 +180,79 @@ const ItemDetail: NextPage = () => {
                                 />
                                 </a>
                             </Link>
-                            ))
-                        : [1, 1, 1, 1].map((_, i) => (
-                            <div key={i}>
-                                <Skeleton height={224} className="mb-4" />
-                                <Skeleton className="-mb-1" />
-                                <Skeleton height={10} />
-                            </div>
-                            ))}
+                        ))}
                     </div>
                     </div>
                 </div>
                 </div>
             </>
             ) : (
-            <NotFound Content="상품 정보를 찾을 수 없습니다." />
+                <NotFound Content="상품 정보를 찾을 수 없습니다." />
             )}
         </Layout>
     );
+}
+
+export const getStaticPaths: GetStaticPaths = () => {
+    return {
+        paths: [],
+        fallback: "blocking"
+    }
+}
+
+export const getStaticProps: GetStaticProps = async (ctx) => {
+
+    if (!ctx?.params?.id) {
+        return {
+            props: {}
+        }
+    };
+
+    if (Number.isNaN(Number(ctx.params.id))) {
+        return {
+            props: {}
+        }
+    }
+
+    const product = await client.product.findUnique({
+        where: {
+            id: Number(ctx.params.id),
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    avator: true
+                }
+            },
+            review: true
+        }
+    })
+
+    const terms = product?.name.split(" ").map(word => ({
+        name: {
+            contains: word
+        }
+    }));
+
+    const relatedProducts = await client.product.findMany({
+        where: {
+            OR: terms,
+            AND: {
+                id: {
+                    not: product?.id
+                }
+            }
+        }
+    });
+
+    return {
+        props: {
+            product: JSON.parse(JSON.stringify(product)),
+            relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
+        }
+    }
 }
 
 export default ItemDetail;

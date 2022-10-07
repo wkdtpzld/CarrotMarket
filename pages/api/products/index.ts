@@ -50,14 +50,6 @@ async function handler(
         const productCount = await client.product.count();
         const products = await client.product.findMany({
             include: {
-                records: {
-                    where: {
-                        kind: 'Fav'
-                    },
-                    select: {
-                        id: true
-                    }
-                },
                 _count: {
                     select: {
                         records: {
@@ -68,6 +60,9 @@ async function handler(
                         chatRoom: true
                     },
                 }
+            },
+            orderBy: {
+                createdAt: 'desc'
             },
             take: 10,
             skip: (Number(page) -1) * 10

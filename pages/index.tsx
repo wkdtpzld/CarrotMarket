@@ -2,14 +2,15 @@ import type { NextPage } from 'next'
 import AddBtn from '@components/Icon/AddBtn';
 import Item from '@components/Items/Item';
 import Layout from '@components/Common/Layout';
-import useSWRInfinite from 'swr/infinite';
-import Head from 'next/head';
+import useSWRInfinite, { unstable_serialize } from 'swr/infinite';
 import Link from 'next/link';
 import { Product } from '@prisma/client';
-import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useInfiniteScroll } from '../libs/client/useInfiniteScroll';
 import { useEffect } from 'react';
+import { SWRConfig } from 'swr';
+import { GetStaticProps } from 'next';
+import client from '@libs/server/client';
 
 interface ProductsWithHeart extends Product {
   _count: {
@@ -25,20 +26,16 @@ interface ProductsResponse {
 }
 
 const getKey = (pageIndex: number, previousPageData: ProductsResponse) => {
-  if (pageIndex === 0) return `/api/products?page=1`;
-  if (pageIndex + 1 > previousPageData.pages) return null;
+  if (previousPageData && !previousPageData.products.length) return null;
   return `/api/products?page=${pageIndex + 1}`;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 const Home: NextPage = () => {
 
-  const { data, setSize } = useSWRInfinite<ProductsResponse>(getKey, fetcher);
-
-  const products = data ? data.map(item => item.products).flat() : [];
+  const { data, setSize } = useSWRInfinite<ProductsResponse>(getKey);
 
   const page = useInfiniteScroll();
+
   useEffect(() => {
     setSize(page);
   }, [setSize, page])
@@ -46,42 +43,22 @@ const Home: NextPage = () => {
   return (
     <Layout title='홈' hasTabBar seoTitle='Products | Carrot Market'>
       <div className='flex px-4 flex-col divide-y-2'>
-        {
-          data ? (
-            <>
-              {products.map((product) => (
-                <Item
-                  key={product.id}
-                  image={product.image}
-                  id={product.id}
-                  Name={product.name}
-                  Category={product.price + ""}
-                  Price={product.price}
-                  Like={product._count.records}
-                  ChatCount={product._count.chatRoom} />
-              ))}
-            </>
-          ) : (
-              <>
-                {[1, 1, 1, 1, 1, 1].map((_, i) => (
-                  <div className='flex py-4 justify-between' key={i}>
-                    <div className='flex space-x-4'>
-                      <Skeleton width={80} height={80} />
-                      <div className='pt-2 flex flex-col'>
-                        <Skeleton width={100} />
-                        <Skeleton width={80} height={10} />
-                        <Skeleton width={100} height={23} />
-                      </div>
-                    </div>
-                    <div className='flex items-end justify-end space-x-1.5'>
-                      <Skeleton width={30} />
-                      <Skeleton width={30} />
-                    </div>
-                  </div>
-                ))}
-              </>
-          )
+        {data
+          ? data?.map((item) => {
+            return item.products.map((product) => (
+              <Item
+                key={product.id}
+                image={product.image}
+                id={product.id}
+                Name={product.name}
+                Category={product.price + ""}
+                Price={product.price}
+                Like={product._count.records}
+                ChatCount={product._count.chatRoom} />
+            ))
+          }) : null
         }
+        
         <Link href="/products/upload">
           <a>
             <AddBtn IconD='M12 6v6m0 0v6m0-6h6m-6 0H6' />
@@ -92,4 +69,62 @@ const Home: NextPage = () => {
   )
 }
 
-export default Home;
+const Page: NextPage<ProductsResponse> = ({ products, pages}) => {
+
+  return (
+    <SWRConfig
+      value={{
+        fallback: {
+          [unstable_serialize(getKey)]: [
+            {
+              ok: true,
+              products,
+              pages
+            }
+          ]
+        }
+      }}
+    >
+      <Home />
+    </SWRConfig>
+  )
+}
+
+export const getStaticProps: GetStaticProps = async (ctx) => {
+
+  const productCount = await client.product.count();
+  const products = await client.product.findMany({
+    include: {
+      _count: {
+        select: {
+            records: {
+                where: {
+                    kind: 'Fav'
+                }
+            },
+            chatRoom: true
+        },
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    },
+    take: 10,
+    skip: 0
+  });
+
+  if (!products) return {
+    props: {}
+  }
+
+  return {
+    props: {
+      ok: true,
+      products: JSON.parse(JSON.stringify(products)),
+      pages: Math.ceil(productCount / 10)
+    }
+  }
+
+}
+
+export default Page;
