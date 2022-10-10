@@ -56,8 +56,17 @@ async function handler(
         })
     } else if (request.method === "POST") {
 
-        if (user?.id !== Number(id)) {
-            response.status(403).json({
+        const findUser = await client.stream.findUnique({
+            where: {
+                id: Number(id)
+            },
+            select: {
+                userId: true
+            }
+        });
+
+        if (user?.id !== findUser?.userId) {
+            return response.status(403).json({
                 ok: false
             })
         }

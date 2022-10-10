@@ -28,7 +28,7 @@ const Upload: NextPage = () => {
     const [photoPreview, setPhotopreview] = useState("");
 
     const router = useRouter();
-    const { register, handleSubmit, watch } = useForm<UploadProductForm>();
+    const { register, handleSubmit, watch, formState: {errors}, reset } = useForm<UploadProductForm>();
     const [uploadProduct, { loading, data, error }] = useMutation<UploadProductMutation>("/api/products");
     const onValid = async ({name, price, photo, description}: UploadProductForm) => {
         if (loading) return;
@@ -44,9 +44,10 @@ const Upload: NextPage = () => {
             })).json();
 
             uploadProduct({name, price, description, photoId:id});
-
+            reset();
         } else {
             uploadProduct({name, price, description});
+            reset();
         }
 
     };
@@ -85,17 +86,80 @@ const Upload: NextPage = () => {
                             <svg className="h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
-                            <input className='hidden' type="file" {...register("photo")} accept="image/*" />
+                            <input 
+                                className='hidden'
+                                type="file"
+                                {...register("photo", {
+                                    required: {
+                                        value: true,
+                                        message: "상품 이미지는 반드시 첨부해 주세요."
+                                    }
+                                })}
+                                
+                                accept="image/*" />
                         </label>
                         )}
+                        {errors.photo ?
+                            <span className="text-sm text-red-600 font-medium ">{errors.photo.message}</span>
+                        : null}
                 </div>
                 <div>
-                    <NormalInput type='text' kind='email' Name='name' Label='Name' register={register("name")} required={true}/>
+                    <NormalInput
+                        type='text'
+                        kind='email'
+                        Name='name'
+                        Label='Name'
+                        register={register("name", {
+                            required: {
+                                value: true,
+                                message: "상품 이름을 꼭 입력해 주세요."
+                            },
+                            maxLength: {
+                                value: 20,
+                                message: "상품 이름은 2자에서 20자 이내로 설정해 주세요."
+                            },
+                            minLength: {
+                                value: 2,
+                                message: "상품 이름은 2자에서 20자 이내로 설정해 주세요."
+                            }
+                        })}
+                        error={errors.name}
+                        />
                 </div>
                 <div>
-                    <NormalInput type='number' kind='price' Name="price" Label='Price' register={register("price")} required={true}/>
+                    <NormalInput
+                        type='number'
+                        kind='price'
+                        Name="price"
+                        Label='Price'
+                        register={register("price", {
+                            required: {
+                                value: true,
+                                message: "가격을 입력해 주세요."
+                            },
+                            maxLength: {
+                                value: 7,
+                                message: "가격이 너무 높게 설정되어있습니다."
+                            }
+                        })}
+                        error={errors.price}
+                        />
                 </div>
-                <TextArea Name='Description' Placeholder='please Input Description' register={register("description")} required={true}/>
+                <TextArea
+                    Name='Description'
+                    Placeholder='please Input Description'
+                    register={register("description", {
+                        required: {
+                            value: true,
+                            message: "상품 설명은 반드시 입력해 주세요."
+                        },
+                        minLength: {
+                            value: 5,
+                            message: "너무 짧습니다. 5글자 이상으로 입력해주세요."
+                        }
+                    })}
+                    error={errors.description}
+                />
                 <SubmitBtn Content={loading ? "loading" : "Upload product"} />
             </form>
         </Layout>

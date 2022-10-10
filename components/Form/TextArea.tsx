@@ -23,10 +23,9 @@ const TextArea = ({Placeholder, Name, register, required, error}:IProps) => {
                     {...register}
                     required={required}
                 />
-                {error?.message
-                    ? (
-                        <div className="text-sm text-gray-700 font-medium mt-2">{error.message}</div>
-                    ) : null}
+                {error?.message ?
+                    <span className="text-sm text-red-600 font-medium ">{error.message}</span>
+                : null}
             </div>
         </div>
     )

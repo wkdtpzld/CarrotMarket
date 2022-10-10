@@ -15,10 +15,8 @@ interface ReviewWithUser extends Review {
 }
 
 interface ReviewsResponse {
-
     ok: boolean;
     reviews: ReviewWithUser[]
-
 }
 
 const Profile: NextPage = () => { 

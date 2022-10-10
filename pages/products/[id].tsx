@@ -123,7 +123,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({product, relatedProducts}) =>
                         Content="Talk to seller"
                         />
                         <motion.button
-                        whileTap={{ scale: 0.2 }}
+                        whileTap={{ scale: 1.5 }}
                         onClick={onFavClick}
                         className={cls(
                             "p-3 mt-6 flex items-center justify-center rounded-md",

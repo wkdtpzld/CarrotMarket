@@ -38,7 +38,7 @@ export default function Layout({ title, canGoBack, hasTabBar, children, seoTitle
             <div className={cls("pt-14", hasTabBar ? "pb-24" : "")}>
                 {children}
             </div>
-            {hasTabBar ? <nav className='z-50 bg-white text-gray-800 border-t fixed bottom-0 px-10 pb-3 pt-3
+            {hasTabBar ? <nav className='z-50 bg-white text-gray-800 border-t fixed bottom-0 px-7 pb-3 pt-3
                 flex justify-between items-center max-w-xl w-full'>
                 <TabBarMenu
                     IconD={MenuIconType.Home}

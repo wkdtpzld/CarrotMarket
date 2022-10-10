@@ -11,7 +11,7 @@ async function handler(
 ) {
     const {
         session: { user },
-        query: { kind }
+        query: { kind, page }
     } = request;
 
     
@@ -38,6 +38,11 @@ async function handler(
                 }
             },
         },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        take: 10,
+        skip: (Number(page) - 1) * 10
         
     });
 

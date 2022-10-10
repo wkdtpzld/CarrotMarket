@@ -16,6 +16,7 @@ import { useEffect } from 'react';
 import NotFound from '@components/Common/NotFound';
 import client from '@libs/server/client';
 import { SWRConfig, unstable_serialize } from 'swr';
+import TransformDate from '../../libs/client/TransformDate';
 
 interface AnswerWithUser extends Answer{
     user: User;
@@ -94,7 +95,7 @@ const CommunityDetail: NextPage = () => {
             {data?.post ? (
                 <div className=''>
                 <span className='inline-flex my-3 ml-4 items-center px-4 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800'
-                    >동네질문</span>
+                    >동내질문</span>
                 <div className='flex mb-5 py-3 border-t border-b items-center space-x-3 px-4'>
                     <ProfileBox
                         Name={data?.post?.user?.name!}
@@ -118,8 +119,9 @@ const CommunityDetail: NextPage = () => {
                     <CommentItem
                         key={answer.id}
                         Name={answer.user.name}
-                        Date={answer.createdAt.toString()}
+                        Date={TransformDate(answer.createdAt)}
                         Comment={answer.answer}
+                        imageId={answer.user.avator!}
                     />   
                 ))}
                 <form className='px-4' onSubmit={handleSubmit(onValid)}>
