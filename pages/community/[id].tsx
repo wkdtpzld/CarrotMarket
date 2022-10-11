@@ -12,11 +12,12 @@ import { Answer, Post, User } from '@prisma/client';
 import useMutation from '../../libs/client/useMutation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import NotFound from '@components/Common/NotFound';
 import client from '@libs/server/client';
 import { SWRConfig, unstable_serialize } from 'swr';
 import TransformDate from '../../libs/client/TransformDate';
+import useUser from '@libs/client/useUser';
 
 interface AnswerWithUser extends Answer{
     user: User;
@@ -47,19 +48,36 @@ interface AnswerResponse {
     ok: boolean;
 }
 
+interface DeleteResponse {
+    ok: boolean
+}
+
 const CommunityDetail: NextPage = () => {
 
+    const [isOk, setIsOk] = useState();
     const router = useRouter();
+    const { user } = useUser();
     const { register, handleSubmit, reset, formState: { errors } } = useForm<AnswerForm>();
     const { data, mutate } =
         useSWR<CommunityPostResponse>(router.query.id ? `/api/posts/${router.query.id}` : null);
     
     const [wonder, { loading }]
-        = useMutation(`/api/posts/${router.query.id}/wonder`);
+        = useMutation(`/api/posts/${router.query.id}/wonder`, "POST");
 
     const [sendAnswer, { data: answerData, loading: answerLoading }]
-        = useMutation<AnswerResponse>(`/api/posts/${router.query.id}/answers`);
+        = useMutation<AnswerResponse>(`/api/posts/${router.query.id}/answers`, "POST");
 
+    const [deletePost, { data: deleteData, loading: deleteLoading }]
+        = useMutation<DeleteResponse>(`/api/posts/${router.query.id}`, "DELETE");
+    
+    const onDeleteClick = () => {
+        
+        if (deleteLoading) return;
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            deletePost({});
+        }
+    }
+    
     const onWonderClick = () => {
         if (!data) return;
         mutate({
@@ -89,14 +107,30 @@ const CommunityDetail: NextPage = () => {
         }
     }, [answerData, reset, mutate]);
     
+    useEffect(() => {
+        if (deleteData && deleteData.ok) {
+            router.push(`/community`)
+        }
+    }, [router, deleteData]);
 
     return (
         <Layout canGoBack>
             {data?.post ? (
-                <div className=''>
+            <div className='relative'>
                 <span className='inline-flex my-3 ml-4 items-center px-4 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800'
                     >동내질문</span>
-                <div className='flex mb-5 py-3 border-t border-b items-center space-x-3 px-4'>
+                    {user?.id === data.post.userId
+                        ? (
+                        <button 
+                            onClick={onDeleteClick}
+                            className='absolute w-20 h-5 rounded-md bg-orange-400 text-sm text-white
+                            text-center flex items-center justify-center right-4 -top-0 my-3 hover:bg-orange-500
+                            focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 focus:outline-none px-2'>
+                            질문 삭제
+                        </button>
+                        ): null}
+                
+                <div className='flex mb-5 py-3 border-t border-b items-center space-x-3 px-4 relative'>
                     <ProfileBox
                         Name={data?.post?.user?.name!}
                         isMine={false}
@@ -104,7 +138,7 @@ const CommunityDetail: NextPage = () => {
                         imageId={data?.post.user.avator!}
                     />
                 </div>
-                <div className='px-4 pb-2'>
+                <div className='px-4 pb-2 relative'>
                     <div className='mt-2 text-gray-700'>
                         <span className='text-orange-500 font-medium mr-2'>Q.</span> {data?.post?.question}
                     </div>

@@ -16,7 +16,7 @@ const ProfileBox = ({ Name, isMine, id, imageId }: IProps) => {
 
     return (
         <Link href={!isMine? `/profile/${id + ""}` : `/profile/edit`}>
-            <a className='flex space-x-4 items-center'>
+            <a className='flex space-x-4 items-center w-60'>
                 {imageId ? (
                     <Image
                         src={ImageURL(imageId, "avatar")}

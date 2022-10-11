@@ -35,6 +35,10 @@ interface ChatRoomResponse {
     chatRoom : ChatRoom
 }
 
+interface DeleteResponse {
+    ok: boolean
+}
+
 const ItemDetail: NextPage<ItemDetailResponse> = ({product, relatedProducts}) => { 
 
     const router = useRouter();
@@ -44,10 +48,26 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({product, relatedProducts}) =>
     const { data, mutate:boundMutate } = useSWR<ItemDetailResponse>
         (router.query.id ? `/api/products/${router.query.id}` : null);
     
+    const [deleteProduct, { data: DeleteData, loading: DeleteLoading }]
+        = useMutation<DeleteResponse>(`/api/products/${router.query.id}`, "DELETE");
     
+    const onDeleteClick = () => {
+        if (DeleteLoading) return;
+
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            deleteProduct({});
+        }
+    }
+
+    useEffect(() => {
+        if (DeleteData && DeleteData.ok) {
+            router.push(`/`)
+        }
+    }, [router, DeleteData]);
+
     // 채팅 관련
     const [createChatRoom, { data: chatData, loading: chatLoading, error: chatError }]
-        = useMutation<ChatRoomResponse>(`/api/chat`);
+        = useMutation<ChatRoomResponse>(`/api/chat`, "POST");
     
     const onClickChatRoom = () => {
         if (chatLoading) return;
@@ -70,7 +90,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({product, relatedProducts}) =>
 
 
     // 좋아요 관련
-    const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
+    const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`, "POST");
     const onFavClick = () => {
         toggleFav({})
         if (!data) return;
@@ -92,21 +112,32 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({product, relatedProducts}) =>
                 </div>
                 ) : null}
                 <div className="px-4 py-10 ">
-                <div className="">
+                <div className="relative">
                     <div className="relative pb-96 mb-6">
-                    <Image
-                        src={ImageURL(product?.image!, "public")}
-                        className="h-96 bg-slate-300 mb-4 m-auto object-scale-down rounded-md"
-                        layout="fill"
-                        alt={product?.name}
-                    />
+                        <Image
+                            src={ImageURL(product?.image!, "public")}
+                            className="h-96 bg-slate-300 mb-4 m-auto object-scale-down rounded-md"
+                            layout="fill"
+                            alt={product?.name}
+                        />
                     </div>
                     <ProfileBox
-                    Name={product?.user.name!}
-                    isMine={false}
-                    id={product?.userId!}
-                    imageId={product.user.avator!}
+                        Name={product?.user.name!}
+                        isMine={false}
+                        id={product?.userId!}
+                        imageId={product.user.avator!}
                     />
+                    {product.userId === user?.id ? 
+                    (
+                        <button 
+                            onClick={onDeleteClick}
+                            className='absolute w-28 h-10 rounded-md bg-orange-400 text-sm text-white
+                            text-center flex items-center justify-center right-0 top-96 mt-7 hover:bg-orange-500
+                            focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 focus:outline-none px-2'>
+                            게시물 삭제
+                        </button>
+                    ) : null}
+                    
                     <div className="mt-10">
                         <h1 className="text-3xl font-bold text-gray-800">
                             {product?.name}
@@ -177,6 +208,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({product, relatedProducts}) =>
                                 <SilmilarItem
                                     Name={item.name}
                                     Price={item.price}
+                                    image={item.image}
                                 />
                                 </a>
                             </Link>

@@ -9,72 +9,105 @@ async function handler(
     response: NextApiResponse<ResponseType>
 ) {
 
-    const {
-        query: { id },
-        session: { user }
-    } = request;
+    if (request.method === "GET") {
+        const {
+            query: { id },
+            session: { user }
+        } = request;
+        
+        
+        if (Number.isNaN(id)) {
+            return response.json({
+                ok: false
+            })
+        }
+        
     
-    
-    if (Number.isNaN(id)) {
-        return response.json({
-            ok: false
-        })
-    }
-    
-
-    const product = await client.product.findUnique({
-        where: {
-            id: Number(id),
-        },
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    avator: true
-                }
+        const product = await client.product.findUnique({
+            where: {
+                id: Number(id),
             },
-            review: true
-        }
-    })
-
-    const terms = product?.name.split(" ").map(word => ({
-        name: {
-            contains: word
-        }
-    }));
-
-    const relatedProducts = await client.product.findMany({
-        where: {
-            OR: terms,
-            AND: {
-                id: {
-                    not: product?.id
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avator: true
+                    }
+                },
+                review: true
+            }
+        })
+    
+        const terms = product?.name.split(" ").map(word => ({
+            name: {
+                contains: word
+            }
+        }));
+    
+        const relatedProducts = await client.product.findMany({
+            where: {
+                OR: terms,
+                AND: {
+                    id: {
+                        not: product?.id
+                    }
                 }
             }
-        }
-    });
+        });
+    
+        const isLiked = Boolean(await client.record.findFirst({
+            where: {
+                kind: 'Fav',
+                productId: product?.id,
+                userId: user?.id
+            },
+            select: {
+                id: true
+            }
+        }));
+    
+        return response.json({
+            ok: true,
+            product,
+            relatedProducts,
+            isLiked
+        })
+    } else if (request.method = "DELETE") {
+        const {
+            query: { id },
+            session: { user }
+        } = request;
 
-    const isLiked = Boolean(await client.record.findFirst({
-        where: {
-            kind: 'Fav',
-            productId: product?.id,
-            userId: user?.id
-        },
-        select: {
-            id: true
-        }
-    }));
+        const targetProduct = await client.product.findUnique({
+            where: {
+                id: Number(id)
+            },
+            select: {
+                id: true,
+                userId: true
+            }
+        });
 
-    response.json({
-        ok: true,
-        product,
-        relatedProducts,
-        isLiked
-    })
+        if (targetProduct?.userId !== user?.id) {
+            return response.json({
+                ok: false
+            });
+        }
+
+        await client.product.delete({
+            where: {
+                id: Number(id)
+            }
+        });
+
+        return response.json({
+            ok: true
+        });
+    }
 }
 
 export default withApiSession(withHandler({
-    method: ["GET"],
+    method: ["GET", "DELETE"],
     fn: handler,
 }));
