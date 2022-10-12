@@ -90,11 +90,47 @@ async function handler(
         return response.json({
             ok: true
         });
+    } else if (request.method === "PATCH") {
+        const {
+            body: { message },
+            query: { id },
+            session: { user }
+        } = request
+
+        const targetPost = await client.post.findUnique({
+            where: {
+                id: Number(id)
+            },
+            select: {
+                id: true,
+                userId: true
+            }
+        });
+
+        if (user?.id !== targetPost?.userId) {
+            return response.json({
+                ok: false
+            });
+        };
+
+        const updatePost = await client.post.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                question: message
+            }
+        });
+
+        response.json({
+            ok: true,
+            updatePost
+        });
     }
     
 }
 
 export default withApiSession(withHandler({
-    method: ["GET","DELETE"],
+    method: ["GET","DELETE","PATCH"],
     fn: handler,
 }));

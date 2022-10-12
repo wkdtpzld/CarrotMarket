@@ -24,7 +24,7 @@ const WriteCommunity: NextPage = () => {
 
     const router = useRouter();
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<WriteForm>();
-    const [post, {loading, data}] = useMutation<WriteResponse>("/api/posts");
+    const [post, {loading, data}] = useMutation<WriteResponse>("/api/posts", "POST");
     const onValid = (data: WriteForm) => {
         if (loading) return;
         post({...data, latitude, longitude});

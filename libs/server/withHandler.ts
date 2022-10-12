@@ -5,7 +5,7 @@ export interface ResponseType {
     [key: string]: any;
 }
 
-type method = "GET" | "POST" | "DELETE" | "PUT"
+type method = "GET" | "POST" | "DELETE" | "PATCH"
 
 interface ConfigType {
     method: method[],
@@ -21,6 +21,8 @@ export default function withHandler({
 
     return async function (request: NextApiRequest, response: NextApiResponse) : Promise<any> {
         if (request.method && !method.includes(request.method as any)) {
+            console.log("not match", request.method);
+            
             return response.status(405).end();
         }
         if (isPrivate && !request.session.user) {

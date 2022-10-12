@@ -65,7 +65,7 @@ const ChatDetail: NextPage = () => {
 
     // Reservation 관련
     const [reservation, { data: reservationData, loading: reservationLoading }]
-        = useMutation<ReservationResponse>(`/api/chat/${router.query.id}/reservation`);
+        = useMutation<ReservationResponse>(`/api/chat/${router.query.id}/reservation`, "POST");
     
     const onClickCreateReservation = () => {
         if (reservationLoading) return;
@@ -94,7 +94,7 @@ const ChatDetail: NextPage = () => {
     }, [reservationData]);
 
     // Message 관련
-    const [createMessage, {data:MessageData, loading}] = useMutation(`/api/chat/${router.query.id}/message`);
+    const [createMessage, {data:MessageData, loading}] = useMutation(`/api/chat/${router.query.id}/message`, "POST");
 
     const { register, handleSubmit, reset } = useForm<MessageForm>();
     const onValid = (form: MessageForm) => {

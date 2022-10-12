@@ -25,7 +25,7 @@ interface EditProfileResponse {
 const ProfileEdit: NextPage = () => { 
 
     // API 관련
-    const [editProfile, { data, loading }] = useMutation<EditProfileResponse>(`/api/users/me`);
+    const [editProfile, { data, loading }] = useMutation<EditProfileResponse>(`/api/users/me`, "POST");
     const { user } = useUser();
 
     // Form 관련

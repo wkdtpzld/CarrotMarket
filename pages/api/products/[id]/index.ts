@@ -73,7 +73,7 @@ async function handler(
             relatedProducts,
             isLiked
         })
-    } else if (request.method = "DELETE") {
+    } else if (request.method === "DELETE") {
         const {
             query: { id },
             session: { user }
@@ -104,10 +104,51 @@ async function handler(
         return response.json({
             ok: true
         });
+    } else if (request.method === "PATCH") {
+
+        const {
+            body: { name, price, description, photo},
+            session: { user },
+            query: { id }
+        } = request
+
+        const targetProduct = await client.product.findUnique({
+            where: {
+                id: Number(id)
+            },
+            select: {
+                id: true,
+                userId: true
+            }
+        });
+
+        if (user?.id !== targetProduct?.userId) {
+            return response.json({
+                ok: false
+            });
+        }
+
+        const updateProduct = await client.product.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                name,
+                price: Number(price),
+                description,
+                image: photo
+            }
+        });
+
+        response.json({
+            ok: true,
+            updateProduct
+        })
+
     }
 }
 
 export default withApiSession(withHandler({
-    method: ["GET", "DELETE"],
+    method: ["GET", "DELETE", "PATCH"],
     fn: handler,
 }));
