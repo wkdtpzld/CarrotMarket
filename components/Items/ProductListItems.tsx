@@ -28,7 +28,7 @@ export interface ProductListResponse {
 
 
 const ProductListItems = ({data}:IProps) => {
-    
+
     return (
         <>
             <div className='flex px-4 flex-col space-y-5 py-10'>

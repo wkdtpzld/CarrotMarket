@@ -9,14 +9,15 @@ import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { Answer, Post, User } from '@prisma/client';
 
-import useMutation from '../../../libs/client/useMutation';
+import useMutation from '@libs/client/useMutation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import NotFound from '@components/Common/NotFound';
 import client from '@libs/server/client';
 import { SWRConfig, unstable_serialize } from 'swr';
-import TransformDate from '../../../libs/client/TransformDate';
+
+import TransformDate from '@libs/client/TransformDate';
 import useUser from '@libs/client/useUser';
 import Link from 'next/link';
 

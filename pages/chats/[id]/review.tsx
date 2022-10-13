@@ -43,7 +43,7 @@ const Stream: NextPage = () => {
     const router = useRouter();
 
     const [star, setStar] = useState(1);
-    const [createReview, { data:reviewData, loading:reviewLoading }] = useMutation(`/api/reviews`);
+    const [createReview, { data:reviewData, loading:reviewLoading }] = useMutation(`/api/reviews`, "POST");
     const { register, handleSubmit, reset, setValue } = useForm<ReviewForm>();
     const onValid = ({star, reviewMessage }: ReviewForm) => {
         if (reviewLoading) return;

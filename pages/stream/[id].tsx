@@ -44,10 +44,10 @@ const LiveDetail: NextPage = () => {
         });
     
     const [sendMessage, { data: messageData, loading }]
-        = useMutation(`/api/streams/${router.query.id}/message`);
+        = useMutation(`/api/streams/${router.query.id}/message`, "POST");
     
     const [deleteStream, { data: DeleteStreamData, loading: DeleteStreamLoading }]
-        = useMutation(`/api/streams/${router.query.id}`)
+        = useMutation(`/api/streams/${router.query.id}`, "POST")
 
 
     const { register, handleSubmit, reset } = useForm<MessageForm>();

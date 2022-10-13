@@ -23,9 +23,9 @@ interface EnterMutationResult {
 export default function Enter() {
     
     // useMutation
-    const [enter, { loading, data, error }] = useMutation<EnterMutationResult>("/api/users/enter");
+    const [enter, { loading, data, error }] = useMutation<EnterMutationResult>("/api/users/enter", "POST");
     const [confirmToken, { loading: tokenLoading, data: tokenData, error: tokenError }]
-        = useMutation<EnterMutationResult>("/api/users/confirm");
+        = useMutation<EnterMutationResult>("/api/users/confirm", "POST");
     
     // useForm
     const { register, reset, handleSubmit } = useForm<EnterForm>();

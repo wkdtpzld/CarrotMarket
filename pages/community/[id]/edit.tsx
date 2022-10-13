@@ -26,9 +26,6 @@ const EditPost: NextPage = () => {
     const router = useRouter();
     const { data } = useSWR<EditPostResponse>(router.query.id ? `/api/posts/${router.query.id}/edit` : null);
 
-    console.log(data);
-    
-
     const [updatePosts, { data: updateData, loading }]
         = useMutation<EditPostResponse>(`/api/posts/${router.query.id}`, "PATCH");
     
