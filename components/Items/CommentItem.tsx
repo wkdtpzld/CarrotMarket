@@ -19,7 +19,7 @@ const CommentItem = ({Name, Date, Comment, imageId}:IProps) => {
         <div className='px-4 flex items-start space-x-3 my-5'>
             <div className='w-10 h-10 bg-slate-300 rounded-full'>
                 <Image
-                    src={ImageURL(imageId, "avatar")}
+                    src={imageId}
                     width={40}
                     height={40}
                     alt={Name}

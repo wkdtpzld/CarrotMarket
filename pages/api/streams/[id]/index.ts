@@ -17,70 +17,69 @@ async function handler(
     request: NextApiRequest,
     response: NextApiResponse<ResponseType>
 ) {
-    const {
-        query: { id },
-        session: { user }
-    } = request;
+  const {
+    query: { id },
+    session: { user },
+  } = request;
 
-    if (request.method === "GET") {
-        const stream = await client.stream.findUnique({
-            where: {
-                id: Number(id)
+  if (request.method === "GET") {
+    const stream = await client.stream.findUnique({
+      where: {
+        id: Number(id),
+      },
+      include: {
+        messages: {
+          select: {
+            message: true,
+            user: {
+              select: {
+                id: true,
+                avator: true,
+                loginType: true,
+              },
             },
-            include: {
-                messages: {
-                    select: {
-                        message: true,
-                        user: {
-                            select: {
-                                id: true,
-                                avator: true
-                            }
-                        },
-                        id: true
-                    }
-                }
-            },
-            
-        });
-    
-        const isOwner = stream?.userId === user?.id;
-        if (stream && !isOwner) {
-            stream.cloudflareKey = "xxxxx";
-            stream.cloudflareUrl = "xxxxx";
-        }
-        
-        response.json({
-            ok: true,
-            stream
-        })
-    } else if (request.method === "POST") {
+            id: true,
+          },
+        },
+      },
+    });
 
-        const findUser = await client.stream.findUnique({
-            where: {
-                id: Number(id)
-            },
-            select: {
-                userId: true
-            }
-        });
-
-        if (user?.id !== findUser?.userId) {
-            return response.status(403).json({
-                ok: false
-            })
-        }
-
-        await client.stream.delete({
-            where: {
-                id: Number(id)
-            }
-        });
-
-        response.json({
-            ok: true
-        });
+    const isOwner = stream?.userId === user?.id;
+    if (stream && !isOwner) {
+      stream.cloudflareKey = "xxxxx";
+      stream.cloudflareUrl = "xxxxx";
     }
+
+    response.json({
+      ok: true,
+      stream,
+    });
+  } else if (request.method === "POST") {
+    const findUser = await client.stream.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    if (user?.id !== findUser?.userId) {
+      return response.status(403).json({
+        ok: false,
+      });
+    }
+
+    await client.stream.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    response.json({
+      ok: true,
+    });
+  }
 }
 
 export default withApiSession(withHandler({

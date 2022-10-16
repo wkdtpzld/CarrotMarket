@@ -20,6 +20,7 @@ import { SWRConfig, unstable_serialize } from 'swr';
 import TransformDate from '@libs/client/TransformDate';
 import useUser from '@libs/client/useUser';
 import Link from 'next/link';
+import { ImageURL } from '@libs/client/utils';
 
 interface AnswerWithUser extends Answer{
     user: User;
@@ -126,7 +127,9 @@ const CommunityDetail: NextPage = () => {
                         Name={data?.post?.user?.name!}
                         isMine={false}
                         id={data?.post?.userId!}
-                        imageId={data?.post.user.avator!}
+                        imageId={data?.post?.user?.loginType === "default" 
+                          ? ImageURL(data?.post?.user.avator!, "avatar")
+                          : user?.avator!}
                     />
                     {user?.id === data.post.userId
                         ? (
@@ -171,7 +174,9 @@ const CommunityDetail: NextPage = () => {
                         Name={answer.user.name}
                         Date={TransformDate(answer.createdAt)}
                         Comment={answer.answer}
-                        imageId={answer.user.avator!}
+                        imageId={answer?.user?.loginType === "default" 
+                          ? ImageURL(answer?.user.avator!, "avatar")
+                          : answer?.user?.avator!}
                     />   
                 ))}
                 <form className='px-4' onSubmit={handleSubmit(onValid)}>
@@ -232,71 +237,74 @@ export const getStaticPaths: GetStaticPaths = () => {
 }
 
 export const getStaticProps: GetStaticProps = async (ctx:GetStaticPropsContext) => {
-
-    if (!ctx?.params?.id) {
-        return {
-            props: {}
-        }
-    };
-
-    if (Number.isNaN(+ctx.params.id)) {
-        return {
-            props: {}
-        }
-    }
-
-    const id = ctx.params.id;
-
-    const post = await client.post.findUnique({
-        where: {
-            id: Number(ctx?.params?.id)
-        },
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    avator: true
-                }
-            },
-            answers: {
-                select: {
-                    answer: true,
-                    id: true,
-                    createdAt: true,
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            avator: true
-                        }
-                    }
-                }
-            },
-            _count: {
-                select: {
-                    answers: true,
-                    wondering: true
-                }
-            }
-        },
-    });
-
-    const isWondering = Boolean(await client.wondering.findFirst({
-        where: {
-            postId: Number(ctx?.params?.id),
-            userId: post?.id
-        },
-        select: {
-            id: true
-        }
-    }))
-
+  if (!ctx?.params?.id) {
     return {
-        props: {
-            post: JSON.parse(JSON.stringify(post)),
-            isWondering,
-            id
-        }
-    }
+      props: {},
+    };
+  }
+
+  if (Number.isNaN(+ctx.params.id)) {
+    return {
+      props: {},
+    };
+  }
+
+  const id = ctx.params.id;
+
+  const post = await client.post.findUnique({
+    where: {
+      id: Number(ctx?.params?.id),
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avator: true,
+          loginType: true,
+        },
+      },
+      answers: {
+        select: {
+          answer: true,
+          id: true,
+          createdAt: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              avator: true,
+              loginType: true,
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          answers: true,
+          wondering: true,
+        },
+      },
+    },
+  });
+
+  const isWondering = Boolean(
+    await client.wondering.findFirst({
+      where: {
+        postId: Number(ctx?.params?.id),
+        userId: post?.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+  );
+
+  return {
+    props: {
+      post: JSON.parse(JSON.stringify(post)),
+      isWondering,
+      id,
+    },
+  };
 }

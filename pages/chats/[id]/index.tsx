@@ -156,7 +156,9 @@ const ChatDetail: NextPage = () => {
                             key={message.id}
                             Message={message.message}
                             type={user?.id === message.user.id ? "inside" : "opposite"}
-                            imageId={message.user.avator!}
+                            imageId={message?.user?.loginType === "default" 
+                              ? ImageURL(message?.user?.avator!, "avatar")
+                              : message?.user?.avator!}
                         />
                     ))}
                     {data.messages.product?.reservation ? (

@@ -48,6 +48,8 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({product, relatedProducts}) =>
     const { data, mutate:boundMutate } = useSWR<ItemDetailResponse>
         (router.query.id ? `/api/products/${router.query.id}` : null);
     
+    console.log(data);
+  
     const [deleteProduct, { data: DeleteData, loading: DeleteLoading }]
         = useMutation<DeleteResponse>(`/api/products/${router.query.id}`, "DELETE");
     
@@ -125,7 +127,9 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({product, relatedProducts}) =>
                         Name={product?.user.name!}
                         isMine={false}
                         id={product?.userId!}
-                        imageId={product.user.avator!}
+                        imageId={product?.user?.loginType === "default" 
+                          ? ImageURL(product.user.avator!, "avatar")
+                          : user?.avator!}
                     />
                     {product.userId === user?.id ? 
                     (
@@ -248,58 +252,58 @@ export const getStaticPaths: GetStaticPaths = () => {
 }
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
-
-    if (!ctx?.params?.id) {
-        return {
-            props: {}
-        }
-    };
-
-    if (Number.isNaN(+ctx.params.id)) {
-        return {
-            props: {}
-        }
-    }
-
-    const product = await client.product.findUnique({
-        where: {
-            id: Number(ctx.params.id),
-        },
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    avator: true
-                }
-            },
-            review: true
-        }
-    })
-
-    const terms = product?.name.split(" ").map(word => ({
-        name: {
-            contains: word
-        }
-    }));
-
-    const relatedProducts = await client.product.findMany({
-        where: {
-            OR: terms,
-            AND: {
-                id: {
-                    not: product?.id
-                }
-            }
-        }
-    });
-
+  if (!ctx?.params?.id) {
     return {
-        props: {
-            product: JSON.parse(JSON.stringify(product)),
-            relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
-        }
-    }
+      props: {},
+    };
+  }
+
+  if (Number.isNaN(+ctx.params.id)) {
+    return {
+      props: {},
+    };
+  }
+
+  const product = await client.product.findUnique({
+    where: {
+      id: Number(ctx.params.id),
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avator: true,
+          loginType: true,
+        },
+      },
+      review: true,
+    },
+  });
+
+  const terms = product?.name.split(" ").map((word) => ({
+    name: {
+      contains: word,
+    },
+  }));
+
+  const relatedProducts = await client.product.findMany({
+    where: {
+      OR: terms,
+      AND: {
+        id: {
+          not: product?.id,
+        },
+      },
+    },
+  });
+
+  return {
+    props: {
+      product: JSON.parse(JSON.stringify(product)),
+      relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
+    },
+  };
 }
 
 export default ItemDetail;

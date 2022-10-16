@@ -1,6 +1,6 @@
 # Carrot Market
 
-### Go Live => https://jks-market-6mxzx71ae-wkdtpzld.vercel.app/enter
+### Go Live => https://jks-market.vercel.app/
 
 --------
 

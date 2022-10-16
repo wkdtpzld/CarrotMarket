@@ -19,7 +19,7 @@ const ChattingBubble = ({ Message, type, imageId }: IProps) => {
             : "flex items-start space-x-2")}>
             <div className='w-10 h-10 bg-slate-300 rounded-full'>
                 <Image
-                    src={ImageURL(imageId, "avatar")}
+                    src={imageId}
                     width={40}
                     height={40}
                     alt={Message}

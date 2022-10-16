@@ -5,20 +5,18 @@ import Layout from '@components/Common/Layout';
 import ChattingBubble from '@components/Items/ChattingBubble';
 import useSWR from 'swr';
 import { useRouter } from 'next/router';
-import { Message, Stream } from '@prisma/client';
+import { Message, Stream, User } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import useMutation from '@libs/client/useMutation';
 import useUser from '../../libs/client/useUser';
 import { useEffect } from 'react';
 import NotFound from '@components/Common/NotFound';
+import { ImageURL } from '@libs/client/utils';
 
 interface StreamMessage {
     message: string;
     id: number;
-    user: {
-        avator?: string;
-        id: number
-    }
+    user: User
 }
 
 interface StreamWithMessage extends Stream{
@@ -127,7 +125,9 @@ const LiveDetail: NextPage = () => {
                     {data?.stream?.messages.map((item) => (
                         <div key={item.id} className="py-4">
                             <ChattingBubble
-                                imageId={item.user.avator!}
+                                imageId={item.user.loginType === "default" 
+                                  ? ImageURL(item?.user?.avator!, "avatar")
+                                  : item?.user?.avator!}
                                 Message={item.message}
                                 type={user?.id === item.user.id ? 'inside' : 'opposite'}
                             />
