@@ -9,6 +9,7 @@ import ReviewsItem from '@components/Items/ReviewsItem';
 import Link from 'next/link';
 import { withSsrSession } from '@libs/server/withSession';
 import client from '@libs/server/client';
+import { ImageURL } from '@libs/client/utils';
 
 interface ReviewWithUser extends Review {
     createdBy: User
@@ -31,7 +32,9 @@ const Profile: NextPage = () => {
                     Name={user?.name!}
                     isMine
                     id={user?.id!}
-                    imageId={user?.avator!}
+                    imageId={user?.loginType === "default" 
+                      ? ImageURL(user.avator!, "avatar")
+                      : user?.avator!}
                 />
                 <div className='mt-10 flex justify-around'>
                     <Link href='/profile/sold'>
