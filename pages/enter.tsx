@@ -27,7 +27,6 @@ interface oAuthResponse {
 }
 
 export default function Enter() {
-
   const router = useRouter();
 
   // OAuth Login
