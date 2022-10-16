@@ -17,7 +17,8 @@ model User {
   phone           String?     @unique
   email           String?     @unique
   name            String  
-  avator          String? 
+  avator          String?
+  loginType       String?     @default("default")
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   tokens          Token[]

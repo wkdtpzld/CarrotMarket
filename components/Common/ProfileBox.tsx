@@ -19,7 +19,7 @@ const ProfileBox = ({ Name, isMine, id, imageId }: IProps) => {
             <a className='flex space-x-4 items-center w-60'>
                 {imageId ? (
                     <Image
-                        src={ImageURL(imageId, "avatar")}
+                        src={imageId}
                         className='w-16 h-16 bg-slate-300 rounded-full'
                         width={48}
                         height={48}
