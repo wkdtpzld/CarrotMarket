@@ -22,7 +22,7 @@ interface ReviewsResponse {
 
 const Profile: NextPage = () => { 
 
-    const { user, isLoading } = useUser();
+    const { user } = useUser();
     const { data } = useSWR<ReviewsResponse>(`api/reviews`);
 
     return (

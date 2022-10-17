@@ -13,28 +13,35 @@ interface IProps {
 }
 
 const ProfileBox = ({ Name, isMine, id, imageId }: IProps) => {
+  const onErrorHandler = (ev: any) => {
+    ev.target.style = "display: none";
+  };
 
-    return (
-        <Link href={!isMine? `/profile/${id + ""}` : `/profile/edit`}>
-            <a className='flex space-x-4 items-center w-60'>
-                {imageId ? (
-                    <Image
-                        src={imageId}
-                        className='w-16 h-16 bg-slate-300 rounded-full'
-                        width={48}
-                        height={48}
-                        alt={Name}
-                    />
-                ) : (
-                    <div className='w-16 h-16 bg-slate-300 rounded-full'/>   
-                )}
-                <div className='flex flex-col'>
-                    {!Name ? <Skeleton /> : <span className='font-medium text-gray-800'>{Name}</span>}
-                    <span className='text-sm text-gray-700'>{isMine ? `Edit profile →` : "View profile →"}</span>
-                </div>
-            </a>
-        </Link>
-    )
+  return (
+    <Link href={!isMine ? `/profile/${id + ""}` : `/profile/edit`}>
+      <a className="flex space-x-4 items-center w-60">
+        <div className='w-16 h-16 bg-slate-300 rounded-full'>
+          <Image
+            src={imageId!}
+            width={48}
+            height={48}
+            alt={Name}
+            onError={onErrorHandler}
+          />
+        </div>
+        <div className="flex flex-col">
+          {!Name ? (
+            <Skeleton />
+          ) : (
+            <span className="font-medium text-gray-800">{Name}</span>
+          )}
+          <span className="text-sm text-gray-700">
+            {isMine ? `Edit profile →` : "View profile →"}
+          </span>
+        </div>
+      </a>
+    </Link>
+  );
 }
 
 export default ProfileBox;

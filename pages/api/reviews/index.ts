@@ -11,113 +11,115 @@ async function handler(
     request: NextApiRequest,
     response: NextApiResponse<ResponseType>
 ) {
-    if (request.method === "GET") {
-        const {
-            session: { user },
-        } = request;
-    
-        const reviews = await client.review.findMany({
-            where: {
-                createdForId: user?.id
-            },
-            include: {
-                createdBy: {
-                    select: {
-                        id: true,
-                        name: true,
-                        avator: true
-                    }
-                }
-            }
-        });
-    
-        response.json({
-            ok: true,
-            reviews
-        })
-    } else if (request.method === "POST") {
-        const {
-            session: { user },
-            body: { star, reviewMessage, sellerId, buyerId, productId}
-        } = request
+  if (request.method === "GET") {
+    const {
+      session: { user },
+    } = request;
 
-        const isAlreadyExist = await client.review.findFirst({
-            where: {
-                productId: productId
-            },
-            select: {
-                id: true
-            }
-        });
+    const reviews = await client.review.findMany({
+      where: {
+        createdForId: user?.id,
+      },
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            avator: true,
+          },
+        },
+      },
+    });
 
-        if (isAlreadyExist) {
-            response.json({
-                ok: false
-            });
-        };
+    response.json({
+      ok: true,
+      reviews,
+    });
+  } else if (request.method === "POST") {
+    const {
+      session: { user },
+      body: { star, reviewMessage, sellerId, buyerId, productId },
+    } = request;
 
-        const review = await client.review.create({
-            data: {
-                review: reviewMessage,
-                score: star,
-                createdBy: {
-                    connect: {
-                        id: user?.id
-                    }
-                },
-                createdFor: {
-                    connect: {
-                        id: sellerId
-                    }
-                },
-                product: {
-                    connect: {
-                        id: productId
-                    }
-                }
-            }
-        });
+    const isAlreadyExist = await client.review.findFirst({
+      where: {
+        productId: productId,
+      },
+      select: {
+        id: true,
+      },
+    });
 
-        await client.record.create({
-            data: {
-                user: {
-                    connect: {
-                        id: buyerId
-                    }
-                },
-                kind: "Purchase",
-                product: {
-                    connect: {
-                        id: productId
-                    }
-                }
-            }
-        });
-
-        await client.record.create({
-            data: {
-                user: {
-                    connect: {
-                        id: sellerId
-                    }
-                },
-                kind: "Sale",
-                product: {
-                    connect: {
-                        id: productId
-                    }
-                }
-            }
-        })
-
-        response.json({
-            ok: true,
-            review
-        })
+    if (isAlreadyExist) {
+      response.json({
+        ok: false,
+      });
     }
+
+    const review = await client.review.create({
+      data: {
+        review: reviewMessage,
+        score: star,
+        createdBy: {
+          connect: {
+            id: user?.id,
+          },
+        },
+        createdFor: {
+          connect: {
+            id: sellerId,
+          },
+        },
+        product: {
+          connect: {
+            id: productId,
+          },
+        },
+      },
+    });
+
+    await client.record.create({
+      data: {
+        user: {
+          connect: {
+            id: buyerId,
+          },
+        },
+        kind: "Purchase",
+        product: {
+          connect: {
+            id: productId,
+          },
+        },
+      },
+    });
+
+    await client.record.create({
+      data: {
+        user: {
+          connect: {
+            id: sellerId,
+          },
+        },
+        kind: "Sale",
+        product: {
+          connect: {
+            id: productId,
+          },
+        },
+      },
+    });
+
+    response.json({
+      ok: true,
+      review,
+    });
+  }
 }
 
-export default withApiSession(withHandler({
-    method: ["GET","POST"],
+export default withApiSession(
+  withHandler({
+    method: ["GET", "POST"],
     fn: handler,
-}));
+  })
+);

@@ -7,7 +7,6 @@ import { Stream } from '@prisma/client';
 import useSWRInfinite from 'swr/infinite';
 import { useEffect } from 'react';
 import { useInfiniteScroll } from '@libs/client/useInfiniteScroll';
-import useSWR from 'swr';
 
 interface StreamsResponse {
     ok: boolean,

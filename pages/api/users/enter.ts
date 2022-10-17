@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { ResponseType } from '@libs/server/withHandler';
 
 import twilio from "twilio";
-import smtpTransport from '../../../libs/server/email';
+import smtpTransport from '@libs/server/email';
 
 const twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
 

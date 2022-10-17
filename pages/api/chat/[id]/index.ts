@@ -78,9 +78,16 @@ async function handler(
       });
     }
 
+    const TargetUser = await client.user.findUnique({
+      where: {
+        id: request.session.user?.id,
+      },
+    });
+
     response.json({
       ok: true,
       messages,
+      user: TargetUser
     });
   }
 }
