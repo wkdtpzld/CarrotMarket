@@ -23,8 +23,9 @@ const ProfileBox = ({ Name, isMine, id, imageId }: IProps) => {
         <div className='w-16 h-16 bg-slate-300 rounded-full'>
           <Image
             src={imageId!}
-            width={48}
-            height={48}
+            className="flex space-x-4 items-center w-60 rounded-full"
+            width={64}
+            height={64}
             alt={Name}
             onError={onErrorHandler}
           />

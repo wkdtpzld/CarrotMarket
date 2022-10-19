@@ -124,7 +124,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       pages: Math.ceil(productCount / 10)
     }
   }
-
 }
 
 export default Page;
